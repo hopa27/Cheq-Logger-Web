@@ -1,79 +1,106 @@
+import { useState } from "react";
 import { useGetOutstandingReport } from "@workspace/api-client-react";
 import { useDateRange } from "@/lib/date-context";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Card, CardContent } from "@/components/ui/card";
+import { DataGrid, DataGridHeader, DataGridRow, DataGridHead, DataGridBody, DataGridCell } from "@/components/ui/data-grid";
 import { format } from "date-fns";
-import { useLocation } from "wouter";
+import { Link } from "wouter";
 
 function formatCurrency(amount: number) {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+  return new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(amount);
 }
 
 export default function OutstandingReport() {
-  const [, setLocation] = useLocation();
   const { startDate, endDate } = useDateRange();
   const { data: report, isLoading } = useGetOutstandingReport({ startDate, endDate });
 
+  const [sortCol, setSortCol] = useState<string | null>(null);
+  const [sortDir, setSortDir] = useState<"asc" | "desc" | null>(null);
+
+  const handleSort = (col: string) => {
+    if (sortCol === col) {
+      if (sortDir === "asc") setSortDir("desc");
+      else {
+        setSortDir(null);
+        setSortCol(null);
+      }
+    } else {
+      setSortCol(col);
+      setSortDir("asc");
+    }
+  };
+
+  const sortedCheques = [...(report?.cheques || [])].sort((a: any, b: any) => {
+    if (!sortCol || !sortDir) return 0;
+    const aVal = a[sortCol];
+    const bVal = b[sortCol];
+    if (aVal === bVal) return 0;
+    const cmp = aVal < bVal ? -1 : 1;
+    return sortDir === "asc" ? cmp : -cmp;
+  });
+
   return (
-    <div className="flex-1 overflow-auto p-6 md:p-8 bg-muted/10">
-      <div className="mb-6 flex items-end justify-between">
+    <div className="space-y-6">
+      <div className="flex items-end justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Outstanding Cheques</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Uncleared cheques from {format(new Date(startDate), "MMM d, yyyy")} to {format(new Date(endDate), "MMM d, yyyy")}.
+          <h2 className="text-[24px] font-semibold font-['Livvic'] text-[#002f5c]">Outstanding Cheques</h2>
+          <p className="text-[#3d3d3d] font-['Mulish'] mt-1">
+            Uncleared cheques from {format(new Date(startDate), "dd, MMM yyyy")} to {format(new Date(endDate), "dd, MMM yyyy")}.
           </p>
         </div>
         {report && (
-          <div className="text-right bg-card px-4 py-2 rounded border shadow-sm">
-            <p className="text-xs text-muted-foreground uppercase tracking-wide font-semibold">Total Outstanding</p>
-            <p className="text-xl font-bold text-chart-3">{formatCurrency(report.totalAmount)}</p>
-            <p className="text-xs text-muted-foreground">{report.totalCount} cheques</p>
+          <div className="text-right bg-white px-6 py-4 rounded-[8px] border border-[#BBBBBB] shadow-sm">
+            <p className="text-[14px] text-[#3d3d3d] font-bold font-['Mulish'] uppercase">Total Outstanding</p>
+            <p className="text-[24px] font-bold text-[#d72714] font-['Livvic']">{formatCurrency(report.totalAmount)}</p>
+            <p className="text-[14px] text-[#3d3d3d] font-['Mulish']">{report.totalCount} cheques</p>
           </div>
         )}
       </div>
 
-      <Card>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-muted/50">
-                <TableHead>Date</TableHead>
-                <TableHead>Cheque #</TableHead>
-                <TableHead>Payee</TableHead>
-                <TableHead>Account</TableHead>
-                <TableHead>Dept</TableHead>
-                <TableHead className="text-right">Amount</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">Loading report...</TableCell>
-                </TableRow>
-              ) : report?.cheques.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">No outstanding cheques for selected date range.</TableCell>
-                </TableRow>
-              ) : (
-                report?.cheques.map(cheque => (
-                  <TableRow 
-                    key={cheque.id}
-                    className="cursor-pointer hover:bg-muted/50 transition-colors"
-                    onClick={() => setLocation(`/cheques/${cheque.id}`)}
-                  >
-                    <TableCell className="font-medium">{format(new Date(cheque.issueDate), 'MMM d, yyyy')}</TableCell>
-                    <TableCell className="font-mono text-xs">{cheque.chequeNumber}</TableCell>
-                    <TableCell>{cheque.payee}</TableCell>
-                    <TableCell className="text-muted-foreground text-sm">{cheque.accountName}</TableCell>
-                    <TableCell className="text-muted-foreground text-sm">{cheque.departmentName}</TableCell>
-                    <TableCell className="text-right font-medium">{formatCurrency(cheque.amount)}</TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+      <div className="bg-white p-6 rounded-[8px] border border-[#BBBBBB] shadow-sm">
+        <DataGrid>
+          <DataGridHeader>
+            <DataGridRow className="hover:bg-transparent odd:bg-transparent even:bg-transparent">
+              <DataGridHead>Action</DataGridHead>
+              <DataGridHead sortable sortDirection={sortCol === 'issueDate' ? sortDir : null} onSortToggle={() => handleSort('issueDate')}>Date</DataGridHead>
+              <DataGridHead sortable sortDirection={sortCol === 'chequeNumber' ? sortDir : null} onSortToggle={() => handleSort('chequeNumber')}>Cheque #</DataGridHead>
+              <DataGridHead sortable sortDirection={sortCol === 'payee' ? sortDir : null} onSortToggle={() => handleSort('payee')}>Payee</DataGridHead>
+              <DataGridHead sortable sortDirection={sortCol === 'accountName' ? sortDir : null} onSortToggle={() => handleSort('accountName')}>Account</DataGridHead>
+              <DataGridHead sortable sortDirection={sortCol === 'departmentName' ? sortDir : null} onSortToggle={() => handleSort('departmentName')}>Dept</DataGridHead>
+              <DataGridHead className="text-right" sortable sortDirection={sortCol === 'amount' ? sortDir : null} onSortToggle={() => handleSort('amount')}>Amount</DataGridHead>
+            </DataGridRow>
+          </DataGridHeader>
+          <DataGridBody>
+            {isLoading ? (
+              <DataGridRow>
+                <DataGridCell colSpan={7} className="text-center py-8">Loading report...</DataGridCell>
+              </DataGridRow>
+            ) : sortedCheques.length === 0 ? (
+              <DataGridRow>
+                <DataGridCell colSpan={7} className="text-center py-8">No outstanding cheques for selected date range.</DataGridCell>
+              </DataGridRow>
+            ) : (
+              sortedCheques.map(cheque => (
+                <DataGridRow key={cheque.id}>
+                  <DataGridCell>
+                    <Link 
+                      href={`/cheques/${cheque.id}`}
+                      className="text-[#005a9c] underline hover:text-white"
+                    >
+                      View
+                    </Link>
+                  </DataGridCell>
+                  <DataGridCell>{format(new Date(cheque.issueDate), 'dd, MMM yyyy')}</DataGridCell>
+                  <DataGridCell>{cheque.chequeNumber}</DataGridCell>
+                  <DataGridCell>{cheque.payee}</DataGridCell>
+                  <DataGridCell>{cheque.accountName}</DataGridCell>
+                  <DataGridCell>{cheque.departmentName}</DataGridCell>
+                  <DataGridCell className="text-right font-bold">{formatCurrency(cheque.amount)}</DataGridCell>
+                </DataGridRow>
+              ))
+            )}
+          </DataGridBody>
+        </DataGrid>
+      </div>
     </div>
   );
 }

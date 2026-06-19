@@ -9,11 +9,9 @@ import {
   getListDepartmentsQueryKey
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { DataGrid, DataGridHeader, DataGridRow, DataGridHead, DataGridBody, DataGridCell } from "@/components/ui/data-grid";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
 
@@ -63,118 +61,106 @@ export default function Admin() {
   };
 
   return (
-    <div className="flex-1 overflow-auto p-6 md:p-8 bg-muted/10 space-y-8">
+    <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Admin / Setup</h1>
-        <p className="text-sm text-muted-foreground mt-1">Manage system master data.</p>
+        <h2 className="text-[24px] font-semibold font-['Livvic'] text-[#002f5c]">Admin / Setup</h2>
+        <p className="text-[#3d3d3d] font-['Mulish'] mt-1">Manage system master data.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Accounts */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Chart of Accounts</CardTitle>
-            <CardDescription>Accounts available for cheque allocation.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <form onSubmit={handleCreateAccount} className="flex gap-2 items-end">
-              <div className="space-y-1 flex-1">
-                <label className="text-xs font-medium">Code</label>
-                <Input value={newAccCode} onChange={e => setNewAccCode(e.target.value)} required disabled={!canManage} />
-              </div>
-              <div className="space-y-1 flex-[2]">
-                <label className="text-xs font-medium">Name</label>
-                <Input value={newAccName} onChange={e => setNewAccName(e.target.value)} required disabled={!canManage} />
-              </div>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div>
-                    <Button type="submit" disabled={!canManage || createAccount.isPending}>Add</Button>
-                  </div>
-                </TooltipTrigger>
-                {!canManage && <TooltipContent>You need admin access to add accounts.</TooltipContent>}
-              </Tooltip>
-            </form>
-
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader className="bg-muted/50">
-                  <TableRow>
-                    <TableHead>Code</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Status</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {accountsLoading ? (
-                    <TableRow><TableCell colSpan={3} className="text-center">Loading...</TableCell></TableRow>
-                  ) : accounts?.map(acc => (
-                    <TableRow key={acc.id}>
-                      <TableCell className="font-mono text-xs">{acc.code}</TableCell>
-                      <TableCell>{acc.name}</TableCell>
-                      <TableCell>
-                        <Badge variant={acc.active ? "secondary" : "outline"}>{acc.active ? "Active" : "Inactive"}</Badge>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+        <div className="bg-white p-6 rounded-[8px] border border-[#BBBBBB] shadow-sm space-y-6">
+          <div>
+            <h3 className="text-[20px] font-semibold font-['Livvic'] text-[#002f5c]">Chart of Accounts</h3>
+            <p className="text-[14px] text-[#3d3d3d] font-['Mulish']">Accounts available for cheque allocation.</p>
+          </div>
+          
+          <form onSubmit={handleCreateAccount} className="flex gap-4 items-end">
+            <div className="space-y-2 flex-1">
+              <label className="text-[14px] font-bold font-['Mulish'] text-[#3d3d3d]">Code</label>
+              <Input value={newAccCode} onChange={e => setNewAccCode(e.target.value)} required disabled={!canManage} />
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Departments */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Departments</CardTitle>
-            <CardDescription>Departments available for cheque allocation.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <form onSubmit={handleCreateDepartment} className="flex gap-2 items-end">
-              <div className="space-y-1 flex-1">
-                <label className="text-xs font-medium">Code</label>
-                <Input value={newDeptCode} onChange={e => setNewDeptCode(e.target.value)} required disabled={!canManage} />
-              </div>
-              <div className="space-y-1 flex-[2]">
-                <label className="text-xs font-medium">Name</label>
-                <Input value={newDeptName} onChange={e => setNewDeptName(e.target.value)} required disabled={!canManage} />
-              </div>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div>
-                    <Button type="submit" disabled={!canManage || createDepartment.isPending}>Add</Button>
-                  </div>
-                </TooltipTrigger>
-                {!canManage && <TooltipContent>You need admin access to add departments.</TooltipContent>}
-              </Tooltip>
-            </form>
-
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader className="bg-muted/50">
-                  <TableRow>
-                    <TableHead>Code</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Status</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {deptsLoading ? (
-                    <TableRow><TableCell colSpan={3} className="text-center">Loading...</TableCell></TableRow>
-                  ) : departments?.map(dept => (
-                    <TableRow key={dept.id}>
-                      <TableCell className="font-mono text-xs">{dept.code}</TableCell>
-                      <TableCell>{dept.name}</TableCell>
-                      <TableCell>
-                        <Badge variant={dept.active ? "secondary" : "outline"}>{dept.active ? "Active" : "Inactive"}</Badge>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+            <div className="space-y-2 flex-[2]">
+              <label className="text-[14px] font-bold font-['Mulish'] text-[#3d3d3d]">Name</label>
+              <Input value={newAccName} onChange={e => setNewAccName(e.target.value)} required disabled={!canManage} />
             </div>
-          </CardContent>
-        </Card>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div>
+                  <Button type="submit" disabled={!canManage || createAccount.isPending}>Add</Button>
+                </div>
+              </TooltipTrigger>
+              {!canManage && <TooltipContent>You need admin access to add accounts.</TooltipContent>}
+            </Tooltip>
+          </form>
+
+          <DataGrid>
+            <DataGridHeader>
+              <DataGridRow className="hover:bg-transparent odd:bg-transparent even:bg-transparent">
+                <DataGridHead sortable>Code</DataGridHead>
+                <DataGridHead sortable>Name</DataGridHead>
+                <DataGridHead>Status</DataGridHead>
+              </DataGridRow>
+            </DataGridHeader>
+            <DataGridBody>
+              {accountsLoading ? (
+                <DataGridRow><DataGridCell colSpan={3} className="text-center py-4">Loading...</DataGridCell></DataGridRow>
+              ) : accounts?.map(acc => (
+                <DataGridRow key={acc.id}>
+                  <DataGridCell>{acc.code}</DataGridCell>
+                  <DataGridCell>{acc.name}</DataGridCell>
+                  <DataGridCell>{acc.active ? "Active" : "Inactive"}</DataGridCell>
+                </DataGridRow>
+              ))}
+            </DataGridBody>
+          </DataGrid>
+        </div>
+
+        <div className="bg-white p-6 rounded-[8px] border border-[#BBBBBB] shadow-sm space-y-6">
+          <div>
+            <h3 className="text-[20px] font-semibold font-['Livvic'] text-[#002f5c]">Departments</h3>
+            <p className="text-[14px] text-[#3d3d3d] font-['Mulish']">Departments available for cheque allocation.</p>
+          </div>
+          
+          <form onSubmit={handleCreateDepartment} className="flex gap-4 items-end">
+            <div className="space-y-2 flex-1">
+              <label className="text-[14px] font-bold font-['Mulish'] text-[#3d3d3d]">Code</label>
+              <Input value={newDeptCode} onChange={e => setNewDeptCode(e.target.value)} required disabled={!canManage} />
+            </div>
+            <div className="space-y-2 flex-[2]">
+              <label className="text-[14px] font-bold font-['Mulish'] text-[#3d3d3d]">Name</label>
+              <Input value={newDeptName} onChange={e => setNewDeptName(e.target.value)} required disabled={!canManage} />
+            </div>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div>
+                  <Button type="submit" disabled={!canManage || createDepartment.isPending}>Add</Button>
+                </div>
+              </TooltipTrigger>
+              {!canManage && <TooltipContent>You need admin access to add departments.</TooltipContent>}
+            </Tooltip>
+          </form>
+
+          <DataGrid>
+            <DataGridHeader>
+              <DataGridRow className="hover:bg-transparent odd:bg-transparent even:bg-transparent">
+                <DataGridHead sortable>Code</DataGridHead>
+                <DataGridHead sortable>Name</DataGridHead>
+                <DataGridHead>Status</DataGridHead>
+              </DataGridRow>
+            </DataGridHeader>
+            <DataGridBody>
+              {deptsLoading ? (
+                <DataGridRow><DataGridCell colSpan={3} className="text-center py-4">Loading...</DataGridCell></DataGridRow>
+              ) : departments?.map(dept => (
+                <DataGridRow key={dept.id}>
+                  <DataGridCell>{dept.code}</DataGridCell>
+                  <DataGridCell>{dept.name}</DataGridCell>
+                  <DataGridCell>{dept.active ? "Active" : "Inactive"}</DataGridCell>
+                </DataGridRow>
+              ))}
+            </DataGridBody>
+          </DataGrid>
+        </div>
       </div>
     </div>
   );

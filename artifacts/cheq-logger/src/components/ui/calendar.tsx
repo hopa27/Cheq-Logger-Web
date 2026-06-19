@@ -1,213 +1,193 @@
 "use client"
 
 import * as React from "react"
-import {
-  ChevronDownIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-} from "lucide-react"
-import { DayButton, DayPicker, getDefaultClassNames } from "react-day-picker"
-
+import { DayPicker } from "react-day-picker"
 import { cn } from "@/lib/utils"
-import { Button, buttonVariants } from "@/components/ui/button"
+import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md"
+import { format, setMonth, setYear, addYears, subYears, addMonths, subMonths } from "date-fns"
+
+export type CalendarProps = React.ComponentProps<typeof DayPicker> & {
+  isError?: boolean;
+}
 
 function Calendar({
   className,
   classNames,
   showOutsideDays = true,
-  captionLayout = "label",
-  buttonVariant = "ghost",
-  formatters,
-  components,
+  month: controlledMonth,
+  onMonthChange,
+  isError,
   ...props
-}: React.ComponentProps<typeof DayPicker> & {
-  buttonVariant?: React.ComponentProps<typeof Button>["variant"]
-}) {
-  const defaultClassNames = getDefaultClassNames()
+}: CalendarProps) {
+  const [view, setView] = React.useState<"days" | "months" | "years">("days")
+  const [currentMonth, setCurrentMonth] = React.useState<Date>(controlledMonth || new Date())
+  const [yearGridStart, setYearGridStart] = React.useState(Math.floor(currentMonth.getFullYear() / 25) * 25)
 
-  return (
-    <DayPicker
-      showOutsideDays={showOutsideDays}
-      className={cn(
-        "bg-background group/calendar p-3 [--cell-size:2rem] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent",
-        String.raw`rtl:**:[.rdp-button\_next>svg]:rotate-180`,
-        String.raw`rtl:**:[.rdp-button\_previous>svg]:rotate-180`,
-        className
-      )}
-      captionLayout={captionLayout}
-      formatters={{
-        formatMonthDropdown: (date) =>
-          date.toLocaleString("default", { month: "short" }),
-        ...formatters,
-      }}
-      classNames={{
-        root: cn("w-fit", defaultClassNames.root),
-        months: cn(
-          "relative flex flex-col gap-4 md:flex-row",
-          defaultClassNames.months
-        ),
-        month: cn("flex w-full flex-col gap-4", defaultClassNames.month),
-        nav: cn(
-          "absolute inset-x-0 top-0 flex w-full items-center justify-between gap-1",
-          defaultClassNames.nav
-        ),
-        button_previous: cn(
-          buttonVariants({ variant: buttonVariant }),
-          "h-[--cell-size] w-[--cell-size] select-none p-0 aria-disabled:opacity-50",
-          defaultClassNames.button_previous
-        ),
-        button_next: cn(
-          buttonVariants({ variant: buttonVariant }),
-          "h-[--cell-size] w-[--cell-size] select-none p-0 aria-disabled:opacity-50",
-          defaultClassNames.button_next
-        ),
-        month_caption: cn(
-          "flex h-[--cell-size] w-full items-center justify-center px-[--cell-size]",
-          defaultClassNames.month_caption
-        ),
-        dropdowns: cn(
-          "flex h-[--cell-size] w-full items-center justify-center gap-1.5 text-sm font-medium",
-          defaultClassNames.dropdowns
-        ),
-        dropdown_root: cn(
-          "has-focus:border-ring border-input shadow-xs has-focus:ring-ring/50 has-focus:ring-[3px] relative rounded-md border",
-          defaultClassNames.dropdown_root
-        ),
-        dropdown: cn(
-          "bg-popover absolute inset-0 opacity-0",
-          defaultClassNames.dropdown
-        ),
-        caption_label: cn(
-          "select-none font-medium",
-          captionLayout === "label"
-            ? "text-sm"
-            : "[&>svg]:text-muted-foreground flex h-8 items-center gap-1 rounded-md pl-2 pr-1 text-sm [&>svg]:size-3.5",
-          defaultClassNames.caption_label
-        ),
-        table: "w-full border-collapse",
-        weekdays: cn("flex", defaultClassNames.weekdays),
-        weekday: cn(
-          "text-muted-foreground flex-1 select-none rounded-md text-[0.8rem] font-normal",
-          defaultClassNames.weekday
-        ),
-        week: cn("mt-2 flex w-full", defaultClassNames.week),
-        week_number_header: cn(
-          "w-[--cell-size] select-none",
-          defaultClassNames.week_number_header
-        ),
-        week_number: cn(
-          "text-muted-foreground select-none text-[0.8rem]",
-          defaultClassNames.week_number
-        ),
-        day: cn(
-          "group/day relative aspect-square h-full w-full select-none p-0 text-center [&:first-child[data-selected=true]_button]:rounded-l-md [&:last-child[data-selected=true]_button]:rounded-r-md",
-          defaultClassNames.day
-        ),
-        range_start: cn(
-          "bg-accent rounded-l-md",
-          defaultClassNames.range_start
-        ),
-        range_middle: cn("rounded-none", defaultClassNames.range_middle),
-        range_end: cn("bg-accent rounded-r-md", defaultClassNames.range_end),
-        today: cn(
-          "bg-accent text-accent-foreground rounded-md data-[selected=true]:rounded-none",
-          defaultClassNames.today
-        ),
-        outside: cn(
-          "text-muted-foreground aria-selected:text-muted-foreground",
-          defaultClassNames.outside
-        ),
-        disabled: cn(
-          "text-muted-foreground opacity-50",
-          defaultClassNames.disabled
-        ),
-        hidden: cn("invisible", defaultClassNames.hidden),
-        ...classNames,
-      }}
-      components={{
-        Root: ({ className, rootRef, ...props }) => {
-          return (
-            <div
-              data-slot="calendar"
-              ref={rootRef}
-              className={cn(className)}
-              {...props}
-            />
-          )
-        },
-        Chevron: ({ className, orientation, ...props }) => {
-          if (orientation === "left") {
-            return (
-              <ChevronLeftIcon className={cn("size-4", className)} {...props} />
-            )
-          }
-
-          if (orientation === "right") {
-            return (
-              <ChevronRightIcon
-                className={cn("size-4", className)}
-                {...props}
-              />
-            )
-          }
-
-          return (
-            <ChevronDownIcon className={cn("size-4", className)} {...props} />
-          )
-        },
-        DayButton: CalendarDayButton,
-        WeekNumber: ({ children, ...props }) => {
-          return (
-            <td {...props}>
-              <div className="flex size-[--cell-size] items-center justify-center text-center">
-                {children}
-              </div>
-            </td>
-          )
-        },
-        ...components,
-      }}
-      {...props}
-    />
-  )
-}
-
-function CalendarDayButton({
-  className,
-  day,
-  modifiers,
-  ...props
-}: React.ComponentProps<typeof DayButton>) {
-  const defaultClassNames = getDefaultClassNames()
-
-  const ref = React.useRef<HTMLButtonElement>(null)
   React.useEffect(() => {
-    if (modifiers.focused) ref.current?.focus()
-  }, [modifiers.focused])
+    if (controlledMonth) {
+      setCurrentMonth(controlledMonth)
+    }
+  }, [controlledMonth])
+
+  const handleMonthChange = (newMonth: Date) => {
+    setCurrentMonth(newMonth)
+    onMonthChange?.(newMonth)
+  }
+
+  const textColor = isError ? "text-[#d72714]" : "text-[#005a9c]"
+  const hoverColor = isError ? "hover:text-[#a51c0d]" : "hover:text-[#003578]"
+
+  if (view === "months") {
+    return (
+      <div className={cn("p-4 bg-white w-[300px]", className)}>
+        <div className="flex justify-center items-center mb-4 relative">
+          <button 
+            type="button"
+            className={cn("font-bold text-[16px] px-2 py-1", textColor, hoverColor)}
+            onClick={() => {
+              setYearGridStart(Math.floor(currentMonth.getFullYear() / 25) * 25)
+              setView("years")
+            }}
+          >
+            {currentMonth.getFullYear()}
+          </button>
+          <div className="absolute inset-x-0 flex justify-between pointer-events-none">
+            <button type="button" onClick={() => handleMonthChange(subYears(currentMonth, 1))} className={cn("h-7 w-7 flex items-center justify-center pointer-events-auto", textColor, hoverColor)}>
+              <MdKeyboardArrowLeft className="h-5 w-5" />
+            </button>
+            <button type="button" onClick={() => handleMonthChange(addYears(currentMonth, 1))} className={cn("h-7 w-7 flex items-center justify-center pointer-events-auto", textColor, hoverColor)}>
+              <MdKeyboardArrowRight className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          {Array.from({ length: 12 }).map((_, i) => {
+            const isSelected = currentMonth.getMonth() === i
+            return (
+              <button
+                key={i}
+                type="button"
+                className={cn(
+                  "p-2 text-center rounded text-sm font-['Mulish'] flex flex-col items-center justify-center",
+                  isSelected ? "bg-[#006cf4] text-white hover:bg-[#003578]" : "hover:bg-[#eef4f8] text-[#3d3d3d]"
+                )}
+                onClick={() => {
+                  handleMonthChange(setMonth(currentMonth, i))
+                  setView("days")
+                }}
+              >
+                <span className="text-[10px] opacity-70 leading-none">{String(i + 1).padStart(2, '0')}</span>
+                <span className="leading-tight">{format(setMonth(new Date(), i), 'MMM')}</span>
+              </button>
+            )
+          })}
+        </div>
+      </div>
+    )
+  }
+
+  if (view === "years") {
+    const years = Array.from({ length: 25 }).map((_, i) => yearGridStart + i)
+    return (
+      <div className={cn("p-4 bg-white w-[300px]", className)}>
+        <div className="flex justify-center items-center mb-4 relative">
+          <div className={cn("font-bold text-[16px] px-2 py-1", textColor)}>
+            {yearGridStart} - {yearGridStart + 24}
+          </div>
+          <div className="absolute inset-x-0 flex justify-between pointer-events-none">
+            <button type="button" onClick={() => setYearGridStart(y => y - 25)} className={cn("h-7 w-7 flex items-center justify-center pointer-events-auto", textColor, hoverColor)}>
+              <MdKeyboardArrowLeft className="h-5 w-5" />
+            </button>
+            <button type="button" onClick={() => setYearGridStart(y => y + 25)} className={cn("h-7 w-7 flex items-center justify-center pointer-events-auto", textColor, hoverColor)}>
+              <MdKeyboardArrowRight className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+        <div className="grid grid-cols-5 gap-2">
+          {years.map(y => {
+            const isSelected = currentMonth.getFullYear() === y
+            return (
+              <button
+                key={y}
+                type="button"
+                className={cn(
+                  "p-2 text-center rounded text-sm font-['Mulish']",
+                  isSelected 
+                    ? "bg-[#006cf4] text-white hover:bg-[#003578]" 
+                    : "hover:bg-[#eef4f8] text-[#3d3d3d] day-outside-hatch"
+                )}
+                onClick={() => {
+                  handleMonthChange(setYear(currentMonth, y))
+                  setView("months")
+                }}
+              >
+                {y}
+              </button>
+            )
+          })}
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <Button
-      ref={ref}
-      variant="ghost"
-      size="icon"
-      data-day={day.date.toLocaleDateString()}
-      data-selected-single={
-        modifiers.selected &&
-        !modifiers.range_start &&
-        !modifiers.range_end &&
-        !modifiers.range_middle
-      }
-      data-range-start={modifiers.range_start}
-      data-range-end={modifiers.range_end}
-      data-range-middle={modifiers.range_middle}
-      className={cn(
-        "data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground data-[range-middle=true]:bg-accent data-[range-middle=true]:text-accent-foreground data-[range-start=true]:bg-primary data-[range-start=true]:text-primary-foreground data-[range-end=true]:bg-primary data-[range-end=true]:text-primary-foreground group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-ring/50 flex aspect-square h-auto w-full min-w-[--cell-size] flex-col gap-1 font-normal leading-none data-[range-end=true]:rounded-md data-[range-middle=true]:rounded-none data-[range-start=true]:rounded-md group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-[3px] [&>span]:text-xs [&>span]:opacity-70",
-        defaultClassNames.day,
-        className
-      )}
-      {...props}
-    />
+    <div className={cn("p-3 bg-white w-[300px]", className)}>
+      <div className="flex justify-center items-center mb-2 relative">
+        <div className="flex gap-1 items-center">
+          <button
+            type="button"
+            className={cn("text-[16px] font-bold bg-transparent border-none cursor-pointer px-1", textColor, hoverColor)}
+            onClick={() => setView("months")}
+          >
+            {format(currentMonth, "MMMM")}
+          </button>
+          <button
+            type="button"
+            className={cn("text-[16px] font-bold bg-transparent border-none cursor-pointer px-1", textColor, hoverColor)}
+            onClick={() => {
+              setYearGridStart(Math.floor(currentMonth.getFullYear() / 25) * 25)
+              setView("years")
+            }}
+          >
+            {format(currentMonth, "yyyy")}
+          </button>
+        </div>
+        <div className="absolute inset-x-0 flex justify-between pointer-events-none">
+          <button type="button" onClick={() => handleMonthChange(subMonths(currentMonth, 1))} className={cn("h-7 w-7 flex items-center justify-center pointer-events-auto", textColor, hoverColor)}>
+            <MdKeyboardArrowLeft className="h-5 w-5" />
+          </button>
+          <button type="button" onClick={() => handleMonthChange(addMonths(currentMonth, 1))} className={cn("h-7 w-7 flex items-center justify-center pointer-events-auto", textColor, hoverColor)}>
+            <MdKeyboardArrowRight className="h-5 w-5" />
+          </button>
+        </div>
+      </div>
+      <DayPicker
+        month={currentMonth}
+        onMonthChange={handleMonthChange}
+        showOutsideDays={showOutsideDays}
+        hideNavigation
+        className="p-0 bg-white"
+        classNames={{
+          months: "flex flex-col w-full",
+          month: "w-full",
+          month_caption: "hidden",
+          weekdays: "flex w-full bg-[#eef4f8] py-1 rounded",
+          weekday: cn("w-9 font-normal text-[0.8rem] flex-1 text-center font-['Mulish']", isError ? "text-[#d72714]" : "text-[#002f5c]"),
+          week: "flex w-full mt-1",
+          day: "h-9 w-9 text-center text-sm p-0 relative font-['Mulish'] flex-1",
+          day_button: "h-9 w-9 p-0 font-normal hover:bg-[#003578] hover:text-white rounded-full mx-auto text-[#3d3d3d] cursor-pointer",
+          today: "[&>button]:text-[#006cf4] [&>button]:font-semibold",
+          selected: "[&>button]:bg-[#006cf4] [&>button]:!text-white [&>button:hover]:bg-[#003578]",
+          outside: "day-outside-hatch opacity-50",
+          disabled: "opacity-50",
+          hidden: "invisible",
+          ...classNames,
+        }}
+        {...props}
+      />
+    </div>
   )
 }
+Calendar.displayName = "Calendar"
 
-export { Calendar, CalendarDayButton }
+export { Calendar }

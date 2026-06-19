@@ -2,18 +2,36 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
-const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
-  ({ className, type, ...props }, ref) => {
+export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  suffixIcon?: React.ReactNode;
+  isError?: boolean;
+}
+
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ className, type, suffixIcon, isError, disabled, ...props }, ref) => {
     return (
-      <input
-        type={type}
-        className={cn(
-          "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-          className
+      <div className="relative w-full">
+        <input
+          type={type}
+          disabled={disabled}
+          className={cn(
+            "flex h-[44px] w-full rounded-[8px] border bg-white px-[12px] py-[8px] font-['Mulish'] text-[16px] leading-[26px] text-[#3d3d3d] placeholder:text-[#BBBBBB] transition-colors focus-visible:outline-none focus-visible:border-[3px] focus-visible:px-[10px] focus-visible:py-[6px] hover:border-[#178830] disabled:cursor-not-allowed disabled:bg-[#CCCCCC] disabled:border-[#ACACAC] disabled:border-[2px] disabled:opacity-100",
+            isError ? "border-[#d72714] text-[#d72714] placeholder:text-[#d72714] focus-visible:border-[#d72714]" : "border-[#BBBBBB] focus-visible:border-[#178830]",
+            suffixIcon ? "pr-[40px]" : "",
+            className
+          )}
+          ref={ref}
+          {...props}
+        />
+        {suffixIcon && (
+          <div className="absolute right-0 top-0 h-[44px] flex items-center pr-3">
+            <div className="h-6 w-[1px] bg-[#BBBBBB] mr-2" />
+            <div className={cn("text-[20px]", isError ? "text-[#d72714]" : "text-[#006cf4]")}>
+              {suffixIcon}
+            </div>
+          </div>
         )}
-        ref={ref}
-        {...props}
-      />
+      </div>
     )
   }
 )

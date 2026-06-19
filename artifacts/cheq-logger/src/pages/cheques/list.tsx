@@ -10,15 +10,14 @@ import {
 import { useDateRange } from "@/lib/date-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Combobox } from "@/components/ui/combobox";
+import { DataGrid, DataGridHeader, DataGridRow, DataGridHead, DataGridBody, DataGridCell } from "@/components/ui/data-grid";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { Search, Plus } from "lucide-react";
+import { MdSearch, MdAdd } from "react-icons/md";
 
 function formatCurrency(amount: number) {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+  return new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(amount);
 }
 
 export default function ChequeList() {
@@ -32,6 +31,22 @@ export default function ChequeList() {
   const [departmentId, setDepartmentId] = useState<string>("all");
   const [status, setStatus] = useState<string>("all");
 
+  const [sortCol, setSortCol] = useState<string | null>(null);
+  const [sortDir, setSortDir] = useState<"asc" | "desc" | null>(null);
+
+  const handleSort = (col: string) => {
+    if (sortCol === col) {
+      if (sortDir === "asc") setSortDir("desc");
+      else {
+        setSortDir(null);
+        setSortCol(null);
+      }
+    } else {
+      setSortCol(col);
+      setSortDir("asc");
+    }
+  };
+
   const { data: accounts } = useListAccounts();
   const { data: departments } = useListDepartments();
 
@@ -44,142 +59,134 @@ export default function ChequeList() {
     search: debouncedSearch || undefined,
   });
 
+  const sortedCheques = [...(cheques || [])].sort((a: any, b: any) => {
+    if (!sortCol || !sortDir) return 0;
+    const aVal = a[sortCol];
+    const bVal = b[sortCol];
+    if (aVal === bVal) return 0;
+    const cmp = aVal < bVal ? -1 : 1;
+    return sortDir === "asc" ? cmp : -cmp;
+  });
+
   const canEdit = profile?.canEdit;
 
+  const accountOptions = [
+    { value: "all", label: "All Accounts" },
+    ...(accounts?.map(a => ({ value: a.id.toString(), label: `${a.code} - ${a.name}` })) || [])
+  ];
+
+  const deptOptions = [
+    { value: "all", label: "All Departments" },
+    ...(departments?.map(d => ({ value: d.id.toString(), label: `${d.code} - ${d.name}` })) || [])
+  ];
+
+  const statusOptions = [
+    { value: "all", label: "All Statuses" },
+    { value: "outstanding", label: "Outstanding" },
+    { value: "cleared", label: "Cleared" },
+    { value: "cancelled", label: "Cancelled" }
+  ];
+
   return (
-    <div className="flex-1 flex flex-col h-full bg-muted/10">
-      <div className="p-6 border-b border-border bg-card">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">Cheque Register</h1>
-            <p className="text-sm text-muted-foreground mt-1">Manage and filter all recorded cheques.</p>
-          </div>
-          
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div>
-                <Button 
-                  onClick={() => setLocation("/cheques/new")}
-                  disabled={!canEdit}
-                  className="gap-2"
-                >
-                  <Plus className="h-4 w-4" />
-                  New / Amend
-                </Button>
-              </div>
-            </TooltipTrigger>
-            {!canEdit && (
-              <TooltipContent>You need edit access to create cheques.</TooltipContent>
-            )}
-          </Tooltip>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search payee or cheque #"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              onBlur={() => setDebouncedSearch(search)}
-              onKeyDown={(e) => e.key === 'Enter' && setDebouncedSearch(search)}
-              className="pl-9"
-            />
-          </div>
-          
-          <Select value={accountId} onValueChange={setAccountId}>
-            <SelectTrigger>
-              <SelectValue placeholder="All Accounts" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Accounts</SelectItem>
-              {accounts?.map(a => (
-                <SelectItem key={a.id} value={a.id.toString()}>{a.code} - {a.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select value={departmentId} onValueChange={setDepartmentId}>
-            <SelectTrigger>
-              <SelectValue placeholder="All Departments" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Departments</SelectItem>
-              {departments?.map(d => (
-                <SelectItem key={d.id} value={d.id.toString()}>{d.code} - {d.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select value={status} onValueChange={setStatus}>
-            <SelectTrigger>
-              <SelectValue placeholder="All Statuses" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="outstanding">Outstanding</SelectItem>
-              <SelectItem value="cleared">Cleared</SelectItem>
-              <SelectItem value="cancelled">Cancelled</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-[24px] font-semibold font-['Livvic'] text-[#002f5c]">Cheque Register</h2>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div>
+              <Button 
+                onClick={() => setLocation("/cheques/new")}
+                disabled={!canEdit}
+              >
+                <MdAdd className="h-5 w-5" />
+                New / Amend
+              </Button>
+            </div>
+          </TooltipTrigger>
+          {!canEdit && (
+            <TooltipContent>You need edit access to create cheques.</TooltipContent>
+          )}
+        </Tooltip>
       </div>
 
-      <div className="flex-1 overflow-auto p-6">
-        <div className="bg-card rounded-md border border-border shadow-sm">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-muted/50 hover:bg-muted/50">
-                <TableHead>Date</TableHead>
-                <TableHead>Cheque #</TableHead>
-                <TableHead>Payee</TableHead>
-                <TableHead>Account</TableHead>
-                <TableHead>Dept</TableHead>
-                <TableHead className="text-right">Amount</TableHead>
-                <TableHead>Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
-                    Loading cheques...
-                  </TableCell>
-                </TableRow>
-              ) : cheques?.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
-                    No cheques found matching filters.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                cheques?.map((cheque) => (
-                  <TableRow 
-                    key={cheque.id}
-                    className="cursor-pointer hover:bg-muted/50 transition-colors"
-                    onClick={() => setLocation(`/cheques/${cheque.id}`)}
-                  >
-                    <TableCell className="font-medium">{format(new Date(cheque.issueDate), 'MMM d, yyyy')}</TableCell>
-                    <TableCell className="font-mono text-xs">{cheque.chequeNumber}</TableCell>
-                    <TableCell>{cheque.payee}</TableCell>
-                    <TableCell className="text-muted-foreground text-sm">{cheque.accountName}</TableCell>
-                    <TableCell className="text-muted-foreground text-sm">{cheque.departmentName}</TableCell>
-                    <TableCell className="text-right font-medium">{formatCurrency(cheque.amount)}</TableCell>
-                    <TableCell>
-                      <Badge variant={
-                        cheque.status === 'cleared' ? 'default' :
-                        cheque.status === 'cancelled' ? 'destructive' :
-                        'secondary'
-                      }>
-                        {cheque.status}
-                      </Badge>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-6 bg-white rounded-[8px] border border-[#BBBBBB] shadow-sm">
+        <Input
+          placeholder="Search payee or cheque #"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          onBlur={() => setDebouncedSearch(search)}
+          onKeyDown={(e) => e.key === 'Enter' && setDebouncedSearch(search)}
+          suffixIcon={<MdSearch />}
+        />
+        
+        <Combobox
+          options={accountOptions}
+          value={accountId}
+          onChange={setAccountId}
+          placeholder="Select Account"
+        />
+
+        <Combobox
+          options={deptOptions}
+          value={departmentId}
+          onChange={setDepartmentId}
+          placeholder="Select Department"
+        />
+
+        <Combobox
+          options={statusOptions}
+          value={status}
+          onChange={setStatus}
+          placeholder="Select Status"
+        />
+      </div>
+
+      <div className="bg-white p-6 rounded-[8px] border border-[#BBBBBB] shadow-sm">
+        <DataGrid>
+          <DataGridHeader>
+            <DataGridRow className="hover:bg-transparent odd:bg-transparent even:bg-transparent">
+              <DataGridHead>Action</DataGridHead>
+              <DataGridHead sortable sortDirection={sortCol === 'issueDate' ? sortDir : null} onSortToggle={() => handleSort('issueDate')}>Date</DataGridHead>
+              <DataGridHead sortable sortDirection={sortCol === 'chequeNumber' ? sortDir : null} onSortToggle={() => handleSort('chequeNumber')}>Cheque #</DataGridHead>
+              <DataGridHead sortable sortDirection={sortCol === 'payee' ? sortDir : null} onSortToggle={() => handleSort('payee')}>Payee</DataGridHead>
+              <DataGridHead sortable sortDirection={sortCol === 'accountName' ? sortDir : null} onSortToggle={() => handleSort('accountName')}>Account</DataGridHead>
+              <DataGridHead sortable sortDirection={sortCol === 'departmentName' ? sortDir : null} onSortToggle={() => handleSort('departmentName')}>Dept</DataGridHead>
+              <DataGridHead className="text-right" sortable sortDirection={sortCol === 'amount' ? sortDir : null} onSortToggle={() => handleSort('amount')}>Amount</DataGridHead>
+              <DataGridHead sortable sortDirection={sortCol === 'status' ? sortDir : null} onSortToggle={() => handleSort('status')}>Status</DataGridHead>
+            </DataGridRow>
+          </DataGridHeader>
+          <DataGridBody>
+            {isLoading ? (
+              <DataGridRow>
+                <DataGridCell colSpan={8} className="text-center py-8">Loading...</DataGridCell>
+              </DataGridRow>
+            ) : sortedCheques.length === 0 ? (
+              <DataGridRow>
+                <DataGridCell colSpan={8} className="text-center py-8">No cheques found.</DataGridCell>
+              </DataGridRow>
+            ) : (
+              sortedCheques.map((cheque) => (
+                <DataGridRow key={cheque.id}>
+                  <DataGridCell>
+                    <Link 
+                      href={`/cheques/${cheque.id}`}
+                      className="text-[#005a9c] underline hover:text-white"
+                    >
+                      View
+                    </Link>
+                  </DataGridCell>
+                  <DataGridCell>{format(new Date(cheque.issueDate), 'dd, MMM, yyyy')}</DataGridCell>
+                  <DataGridCell>{cheque.chequeNumber}</DataGridCell>
+                  <DataGridCell>{cheque.payee}</DataGridCell>
+                  <DataGridCell>{cheque.accountName}</DataGridCell>
+                  <DataGridCell>{cheque.departmentName}</DataGridCell>
+                  <DataGridCell className="text-right">{formatCurrency(cheque.amount)}</DataGridCell>
+                  <DataGridCell className="capitalize">{cheque.status}</DataGridCell>
+                </DataGridRow>
+              ))
+            )}
+          </DataGridBody>
+        </DataGrid>
       </div>
     </div>
   );

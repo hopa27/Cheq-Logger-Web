@@ -1,0 +1,156 @@
+MASTER PROMPT — LVE Component Library & Design System
+
+Build a React + Tailwind CSS application. Every page MUST include the Header component at the top and the Footer component at the bottom. These are mandatory and non-negotiable on every route/page.
+
+FONTS (load via Google Fonts in index.html):
+
+<link href="https://fonts.googleapis.com/css2?family=Livvic:wght@400;500;600;700&family=Mulish:wght@300;400&display=swap" rel="stylesheet">
+
+Livvic — used for headers, page titles, button text, tab labels, and data grid column headers
+Mulish — used for input fields, body text, data grid cell text, calendar day numbers, and placeholder text
+ICONS:
+All icons must use Material Design Line Icons from react-icons/md. No other icon library. Examples: MdOutlineCalendarToday, MdKeyboardArrowDown, MdKeyboardArrowUp, MdCheck.
+
+COLOR PALETTE (strict — do not deviate):
+
+Primary Blue: #006cf4 (buttons, links, selected states)
+Primary Blue Hover: #003578 (hover state for blue elements)
+Navy: #00263e (header background)
+Dark Navy: #002f5c (data grid headers, calendar weekday labels)
+Link Blue: #005a9c (calendar navigation, table action links)
+Secondary Blue: #04589b (secondary button border, data grid header borders)
+Highlight Blue: #05579B (combobox/data grid hover row)
+Green: #178830 (input focus border, calendar popup border, combobox open border)
+Error Red: #d72714 (error states on all components)
+Disabled Grey: #979797 (disabled button background)
+Body Text: #3d3d3d (general body/input text)
+Border Grey: #BBBBBB (default input borders, placeholder text)
+Disabled BG: #CCCCCC (disabled input background)
+Disabled Border: #ACACAC (disabled input border)
+Tab Inactive BG: #eaf5f8 (unselected tab)
+Tab Active Text: #4a4a49 (selected tab text)
+Tab Inactive Text: #0d2c41 (unselected tab text)
+Calendar Weekday BG: #eef4f8 (weekday row background)
+Outside Day Pattern: repeating-linear-gradient(45deg, transparent, transparent 5px, #e7ebec 5px, #e7ebec 10px) (diagonal hatch for outside-month days and year grid unselected cells)
+Scrollbar Thumb: #62bda8 (custom scrollbar for dropdowns)
+DEPENDENCIES:
+
+class-variance-authority (cva) for button variants
+@radix-ui/react-slot for button asChild
+@radix-ui/react-popover for popover/date-picker/combobox
+@radix-ui/react-tabs for tabs
+react-day-picker + date-fns for calendar
+cmdk for combobox command palette
+react-icons for Material Design icons
+tailwindcss, tw-animate-css
+A cn() utility (clsx + tailwind-merge)
+CSS VARIABLES (set in index.css):
+
+--font-sans: 'Livvic', sans-serif (global default)
+--radius: 30px
+--primary: 213 100% 48% (#006cf4)
+--ring: 213 100% 48%
+Custom scrollbar: 6px wide, #62bda8 thumb, transparent track, #4ea896 on hover
+COMPONENT SPECIFICATIONS
+1. HEADER (MANDATORY — every page)
+Full-width, bg-[#00263e], white text
+Horizontal padding: px-[142px], vertical padding: pt-4 pb-6
+Top row: Logo image (left, h-6) and "Logout" ghost button (right, h-8, white text, hover:bg-white/10)
+Horizontal divider: h-px bg-slate-600/50 with mb-6
+Below divider: Page title in font-['Livvic'] text-3xl font-normal tracking-tight text-white
+The logo must be imported as an image asset (place your logo file in an assets directory)
+2. FOOTER (MANDATORY — every page)
+Full-width, white background, border-t border-slate-200
+mt-auto shrink-0 so it sticks to bottom of page
+py-4 px-8, flex row, justify-between
+Left: Logo image (h-6)
+Right: Company address text in text-[10px] font-medium text-slate-400, two lines
+3. BUTTON
+Uses cva with variants: default, destructive, outline, secondary, ghost, link
+Default size: h-[44px] px-8 py-2 rounded-[30px] text-base font-normal (pill shape)
+Default variant: bg-[#006cf4] (primary), hover bg-[#003578], disabled bg-[#979797] text-white opacity-100, shadow-md
+Secondary variant: White bg, text-[#04589b] border border-[#04589b], hover flips to bg-[#003578] text-white border-[#003578], font-weight 700
+Supports asChild via Radix Slot
+Font: Livvic (inherited from global --font-sans)
+4. INPUT
+Height: h-[44px], border-radius: rounded-[8px], border: border-[#BBBBBB], bg white
+Padding: px-[12px] py-[8px]
+Font: font-['Mulish'] text-[16px] leading-[26px] text-[#3d3d3d]
+Placeholder: text-[#BBBBBB] font-['Mulish']
+Focus: border becomes 3px solid #178830 (padding adjusts inward by 2px to prevent layout shift: px-[10px] py-[6px])
+Hover: border color #178830
+Disabled: bg-[#CCCCCC] border-[#ACACAC] text-[#3d3d3d] border-[2px], cursor-not-allowed, opacity stays 100
+Error state: border-[#d72714] text-[#d72714] placeholder:text-[#d72714]
+Supports optional suffixIcon prop — rendered absolutely positioned on right side with a vertical separator line (h-6 w-[1px] bg-[#BBBBBB])
+5. DATE PICKER
+Combines Input + Popover + Calendar
+Input is read-only, displays date formatted as dd, MMM, yyyy
+Suffix icon: vertical separator line + MdOutlineCalendarToday icon in text-[#006cf4] (or text-[#d72714] in error state)
+When open (not error): input gets border-[#178830] border-[2px]
+Calendar popup: rounded-[12px], border-[2px] border-[#178830] (or border-[#d72714] on error), overflow-hidden, white bg, no padding
+Aligned to start
+6. CALENDAR
+Built on react-day-picker (DayPicker)
+Three views: days, months, years — controlled by internal state
+Caption label is split into two clickable buttons: Month name (click → month picker view) and Year (click → year picker view). Both are font-bold text-[#005a9c] text-[16px], ghost buttons with no background
+Navigation arrows: text-[#005a9c], hover text-[#003578], 7x7px ghost buttons
+Weekday row: bg-[#eef4f8], text text-[#002f5c] (in error state: text-[#d72714])
+Day cells: font-['Mulish'], hover → bg-[#003578] text-white rounded-full
+Selected day: bg-[#006cf4] text-white rounded-full, hover → bg-[#003578]
+Today: text-[#006cf4] font-semibold
+Outside days: Diagonal hatch pattern background, 50% opacity
+Month Picker: 3-column grid, selected month bg-[#006cf4] text-white, hover → same blue. Each cell shows month number (small) + month name. Navigation arrows cycle years. Year text in header is clickable → opens year picker
+Year Picker: 5-column grid of 25 years. Selected year bg-[#006cf4] text-white. Unselected years have diagonal hatch pattern background. Navigation arrows shift range by 25 years
+7. COMBOBOX (Dropdown/Select with search)
+Built on cmdk (CommandPrimitive) + Radix Popover
+Trigger: same dimensions/styling as Input (h-[44px] rounded-[8px] border-[#BBBBBB]), with font-['Mulish']
+Right side: vertical separator + MdKeyboardArrowDown icon in text-[#006cf4], rotates 180° when open
+When open: trigger gets border-[3px] border-[#178830], bottom border removed (!border-b-0), bottom corners removed (rounded-b-none). Dropdown panel gets border-[3px] border-[#178830], top border removed (!border-t-0), top corners removed (rounded-t-none), creating a seamless merged appearance. Width matches trigger via var(--radix-popover-trigger-width). sideOffset={0}, avoidCollisions={false}
+Dropdown items: font-['Mulish'] text-[16px] text-[#3d3d3d], hover/selected → bg-[#05579B] text-white, py-3 rounded-none
+Selected item shows MdCheck icon
+Max dropdown height: 200px with custom scrollbar
+Error state: all borders become border-[#d72714], icon becomes text-[#d72714]
+Input is searchable — filters options as user types
+Hover on trigger: border goes #178830
+8. COUNTER INPUT
+Same base styling as Input (h-[44px] rounded-[8px] border-[#BBBBBB] font-['Mulish'])
+Currency symbol (£) fixed on left side
+Right side: vertical separator + up/down arrow buttons (MdKeyboardArrowUp / MdKeyboardArrowDown) in text-[#006cf4], hover → text-[#003578]
+Increment/decrement buttons stacked vertically, full height of input
+Prevents negative values
+Accepts only positive numbers and optional decimal
+Focus state: 3px solid #178830
+Error state: border-[#d72714] text-[#d72714]
+9. CUSTOM TABS
+Built on @radix-ui/react-tabs
+Tab list: flex row with gap-4, transparent background
+Each tab trigger: min-w-[180px], rounded-t-[8px] (rounded top corners only), px-8 py-4, text-[18px] font-semibold font-['Livvic']
+Inactive tab: bg-[#eaf5f8] text-[#0d2c41]
+Active tab: bg-white text-[#4a4a49] with subtle shadow
+Content area: mt-4
+10. DATA GRID (Read-only)
+Built on a custom Table component (border-separate border-spacing-0)
+Header row: py-[24px], font-['Livvic'] font-semibold text-[#002f5c] text-[18px], top and bottom border 3px solid #04589b
+Each sortable column header has a custom double-triangle sort icon (SVG) with gap-4
+First column is for action links (text-[#005a9c] underlined)
+Body rows: alternating white / bg-[#e7ebec34], font-['Mulish'] font-light text-[#3d3d3d] text-[16px]
+Row hover: entire row becomes bg-[#05579B], all text turns white (including links)
+Cell padding: p-[5px]
+11. EDITABLE DATA GRID
+Same table structure as Data Grid but with interactive elements
+Contains radio buttons (circle: w-4 h-4 rounded-full border-[#979797], selected: border-[#006cf4] with inner dot) and checkboxes (square: w-4 h-4 border-[#979797] rounded, selected: bg-[#178830] border-[#178830] with white checkmark SVG)
+Editable percentage input cells: smaller Input (h-[36px], centered text, w-[100px]), when selected: border-[3px] border-[#178830] text-[#178830]
+Alternating rows: white / bg-[#f4f7f8]
+Header border: 2px solid #002f5c
+Action button: rounded-full bg-[#006cf4] hover:bg-[#003578] text-white h-[40px]
+Error messaging in text-[#d72714] font-semibold
+PAGE LAYOUT STRUCTURE (mandatory for every page):
+<div className="min-h-screen flex flex-col bg-[#f0f0f0]">
+  <Header />
+  <main className="flex-1 px-[142px] py-8">
+    {/* Page content goes here */}
+  </main>
+  <Footer />
+</div>
+
+The Header title text should be updated per page to reflect the current page name. The layout ensures Header is always at the top, Footer is always pinned at the bottom, and the main content area fills the remaining space.
