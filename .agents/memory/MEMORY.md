@@ -1,0 +1,4 @@
+- [API codegen date query params](api-codegen-quirks.md) — Orval generates non-coercing `z.date()` for date query params; coerce strings to Date before `.parse` server-side.
+- [HTTP method must match generated client](api-codegen-quirks.md) — server route method (PATCH vs PUT) must match the OpenAPI spec or the generated client call fails at runtime.
+- [First-user-admin bootstrap](rbac-bootstrap.md) — count-then-insert admin promotion is race-prone; serialize with a transaction-scoped `pg_advisory_xact_lock`.
+- [replit-auth-web as composite lib](api-codegen-quirks.md) — when referenced via tsconfig it needs composite:true and an `env.d.ts` declaring `import.meta.env`.

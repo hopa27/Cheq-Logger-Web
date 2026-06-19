@@ -10,6 +10,18 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: Auth
+    description: Browser and mobile authentication endpoints.
+  - name: Profile
+    description: Current user profile and permissions.
+  - name: Accounts
+    description: Bank/ledger accounts.
+  - name: Departments
+    description: Organisational departments.
+  - name: Cheques
+    description: Cheque records.
+  - name: Reports
+    description: Aggregated reporting endpoints.
 paths:
   /healthz:
     get:
@@ -24,7 +36,488 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /auth/user:
+    get:
+      tags: [Auth]
+      operationId: getCurrentAuthUser
+      summary: Get the currently authenticated user
+      parameters:
+        - $ref: '#/components/parameters/AuthorizationSessionHeader'
+        - $ref: '#/components/parameters/SessionCookie'
+      responses:
+        '200':
+          description: Auth status resolved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthUserEnvelope'
+  /login:
+    get:
+      tags: [Auth]
+      operationId: beginBrowserLogin
+      summary: Start the browser OIDC login flow
+      parameters:
+        - name: returnTo
+          in: query
+          required: false
+          description: Relative path to redirect to after login (must start with `/`). Defaults to `/`.
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Redirect to the OIDC authorization endpoint.
+  /callback:
+    get:
+      tags: [Auth]
+      operationId: handleBrowserLoginCallback
+      summary: Complete the browser OIDC login flow
+      parameters:
+        - name: code
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: state
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: iss
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uri
+      responses:
+        '302':
+          description: Redirect to the `returnTo` path on success (defaults to `/`) or `/api/login` on failure.
+  /logout:
+    get:
+      tags: [Auth]
+      operationId: logoutBrowserSession
+      summary: Clear the session and begin OIDC logout
+      parameters:
+        - $ref: '#/components/parameters/AuthorizationSessionHeader'
+        - $ref: '#/components/parameters/SessionCookie'
+      responses:
+        '302':
+          description: Redirect to the OIDC provider logout URL.
+  /mobile-auth/token-exchange:
+    post:
+      tags: [Auth]
+      operationId: exchangeMobileAuthorizationCode
+      summary: Exchange a mobile OIDC code for a session token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MobileTokenExchangeRequest'
+      responses:
+        '200':
+          description: Session created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MobileTokenExchangeSuccess'
+        '400':
+          description: Missing or invalid required fields.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '401':
+          description: Token did not contain usable claims.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '500':
+          description: Token exchange failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+  /mobile-auth/logout:
+    post:
+      tags: [Auth]
+      operationId: logoutMobileSession
+      summary: Delete a mobile session token
+      parameters:
+        - $ref: '#/components/parameters/AuthorizationSessionHeader'
+      responses:
+        '200':
+          description: Logout processed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogoutSuccess'
+
+  /me:
+    get:
+      tags: [Profile]
+      operationId: getMyProfile
+      summary: Get the current user's profile, role and permissions
+      responses:
+        '200':
+          description: The current user's profile.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+  /accounts:
+    get:
+      tags: [Accounts]
+      operationId: listAccounts
+      summary: List all accounts
+      responses:
+        '200':
+          description: A list of accounts.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Account'
+    post:
+      tags: [Accounts]
+      operationId: createAccount
+      summary: Create a new account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountInput'
+      responses:
+        '201':
+          description: Account created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '403':
+          description: Insufficient permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+  /departments:
+    get:
+      tags: [Departments]
+      operationId: listDepartments
+      summary: List all departments
+      responses:
+        '200':
+          description: A list of departments.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Department'
+    post:
+      tags: [Departments]
+      operationId: createDepartment
+      summary: Create a new department
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepartmentInput'
+      responses:
+        '201':
+          description: Department created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Department'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '403':
+          description: Insufficient permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+  /cheques:
+    get:
+      tags: [Cheques]
+      operationId: listCheques
+      summary: List cheques with optional filters
+      parameters:
+        - name: startDate
+          in: query
+          required: false
+          description: Inclusive lower bound on issue date (YYYY-MM-DD).
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          required: false
+          description: Inclusive upper bound on issue date (YYYY-MM-DD).
+          schema:
+            type: string
+            format: date
+        - name: accountId
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: departmentId
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/ChequeStatus'
+        - name: search
+          in: query
+          required: false
+          description: Free-text search over cheque number and payee.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A list of cheques.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Cheque'
+    post:
+      tags: [Cheques]
+      operationId: createCheque
+      summary: Create a new cheque
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChequeInput'
+      responses:
+        '201':
+          description: Cheque created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cheque'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '403':
+          description: Insufficient permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+  /cheques/{id}:
+    get:
+      tags: [Cheques]
+      operationId: getCheque
+      summary: Get a single cheque by id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: The cheque.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cheque'
+        '404':
+          description: Cheque not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+    patch:
+      tags: [Cheques]
+      operationId: updateCheque
+      summary: Amend an existing cheque
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChequeUpdate'
+      responses:
+        '200':
+          description: Updated cheque.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cheque'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '403':
+          description: Insufficient permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '404':
+          description: Cheque not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+  /reports/accounts:
+    get:
+      tags: [Reports]
+      operationId: getAccountsReport
+      summary: Cheque totals grouped by account over a date range
+      parameters:
+        - name: startDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Per-account aggregates.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AccountReportRow'
+
+  /reports/departments:
+    get:
+      tags: [Reports]
+      operationId: getDepartmentsReport
+      summary: Cheque totals grouped by department over a date range
+      parameters:
+        - name: startDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Per-department aggregates.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DepartmentReportRow'
+
+  /reports/outstanding:
+    get:
+      tags: [Reports]
+      operationId: getOutstandingReport
+      summary: Outstanding (uncleared) cheques over a date range
+      parameters:
+        - name: startDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Outstanding cheques with totals.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OutstandingReport'
+
+  /dashboard/summary:
+    get:
+      tags: [Reports]
+      operationId: getDashboardSummary
+      summary: High-level totals for the dashboard
+      responses:
+        '200':
+          description: Dashboard summary metrics.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardSummary'
+
 components:
+  parameters:
+    AuthorizationSessionHeader:
+      name: Authorization
+      in: header
+      required: false
+      description: Opaque session token — `Bearer <sid>`.
+      schema:
+        type: string
+    SessionCookie:
+      name: sid
+      in: cookie
+      required: false
+      description: Browser session cookie.
+      schema:
+        type: string
   schemas:
     HealthStatus:
       type: object
@@ -34,3 +527,330 @@ components:
       required:
         - status
 
+    AuthUser:
+      type: object
+      required: [id, email, firstName, lastName, profileImageUrl]
+      properties:
+        id:
+          type: string
+        email:
+          type: [string, 'null']
+          format: email
+        firstName:
+          type: [string, 'null']
+        lastName:
+          type: [string, 'null']
+        profileImageUrl:
+          type: [string, 'null']
+    AuthUserEnvelope:
+      type: object
+      required: [user]
+      properties:
+        user:
+          oneOf:
+            - $ref: '#/components/schemas/AuthUser'
+            - type: 'null'
+    MobileTokenExchangeRequest:
+      type: object
+      required: [code, code_verifier, redirect_uri, state]
+      properties:
+        code:
+          type: string
+          minLength: 1
+        code_verifier:
+          type: string
+          minLength: 1
+        redirect_uri:
+          type: string
+          minLength: 1
+          format: uri
+        state:
+          type: string
+          minLength: 1
+        nonce:
+          type: string
+          minLength: 1
+    MobileTokenExchangeSuccess:
+      type: object
+      required: [token]
+      properties:
+        token:
+          type: string
+    LogoutSuccess:
+      type: object
+      required: [success]
+      properties:
+        success:
+          type: boolean
+          const: true
+    ErrorEnvelope:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+
+    UserRole:
+      type: string
+      enum: [admin, editor, viewer]
+      description: Access group governing which features are available.
+    Profile:
+      type: object
+      required: [id, email, firstName, lastName, profileImageUrl, role, canEdit, canManage]
+      properties:
+        id:
+          type: string
+        email:
+          type: [string, 'null']
+          format: email
+        firstName:
+          type: [string, 'null']
+        lastName:
+          type: [string, 'null']
+        profileImageUrl:
+          type: [string, 'null']
+        role:
+          $ref: '#/components/schemas/UserRole'
+        canEdit:
+          type: boolean
+          description: Whether the user may create or amend cheques (editor or admin).
+        canManage:
+          type: boolean
+          description: Whether the user may manage accounts and departments (admin).
+
+    Account:
+      type: object
+      required: [id, code, name, active]
+      properties:
+        id:
+          type: integer
+        code:
+          type: string
+        name:
+          type: string
+        active:
+          type: boolean
+    AccountInput:
+      type: object
+      required: [code, name]
+      properties:
+        code:
+          type: string
+          minLength: 1
+        name:
+          type: string
+          minLength: 1
+        active:
+          type: boolean
+
+    Department:
+      type: object
+      required: [id, code, name, active]
+      properties:
+        id:
+          type: integer
+        code:
+          type: string
+        name:
+          type: string
+        active:
+          type: boolean
+    DepartmentInput:
+      type: object
+      required: [code, name]
+      properties:
+        code:
+          type: string
+          minLength: 1
+        name:
+          type: string
+          minLength: 1
+        active:
+          type: boolean
+
+    ChequeStatus:
+      type: string
+      enum: [outstanding, cleared, cancelled]
+
+    Cheque:
+      type: object
+      required:
+        - id
+        - chequeNumber
+        - accountId
+        - accountName
+        - departmentId
+        - departmentName
+        - payee
+        - amount
+        - issueDate
+        - status
+        - clearedDate
+        - notes
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: integer
+        chequeNumber:
+          type: string
+        accountId:
+          type: integer
+        accountName:
+          type: string
+        departmentId:
+          type: integer
+        departmentName:
+          type: string
+        payee:
+          type: string
+        amount:
+          type: number
+          description: Cheque amount in major currency units.
+        issueDate:
+          type: string
+          format: date
+        status:
+          $ref: '#/components/schemas/ChequeStatus'
+        clearedDate:
+          type: [string, 'null']
+          format: date
+        notes:
+          type: [string, 'null']
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    ChequeInput:
+      type: object
+      required: [chequeNumber, accountId, departmentId, payee, amount, issueDate]
+      properties:
+        chequeNumber:
+          type: string
+          minLength: 1
+        accountId:
+          type: integer
+        departmentId:
+          type: integer
+        payee:
+          type: string
+          minLength: 1
+        amount:
+          type: number
+        issueDate:
+          type: string
+          format: date
+        status:
+          $ref: '#/components/schemas/ChequeStatus'
+        clearedDate:
+          type: [string, 'null']
+          format: date
+        notes:
+          type: [string, 'null']
+    ChequeUpdate:
+      type: object
+      properties:
+        chequeNumber:
+          type: string
+          minLength: 1
+        accountId:
+          type: integer
+        departmentId:
+          type: integer
+        payee:
+          type: string
+          minLength: 1
+        amount:
+          type: number
+        issueDate:
+          type: string
+          format: date
+        status:
+          $ref: '#/components/schemas/ChequeStatus'
+        clearedDate:
+          type: [string, 'null']
+          format: date
+        notes:
+          type: [string, 'null']
+
+    AccountReportRow:
+      type: object
+      required: [accountId, accountCode, accountName, chequeCount, totalAmount, outstandingCount, outstandingAmount]
+      properties:
+        accountId:
+          type: integer
+        accountCode:
+          type: string
+        accountName:
+          type: string
+        chequeCount:
+          type: integer
+        totalAmount:
+          type: number
+        outstandingCount:
+          type: integer
+        outstandingAmount:
+          type: number
+    DepartmentReportRow:
+      type: object
+      required: [departmentId, departmentCode, departmentName, chequeCount, totalAmount, outstandingCount, outstandingAmount]
+      properties:
+        departmentId:
+          type: integer
+        departmentCode:
+          type: string
+        departmentName:
+          type: string
+        chequeCount:
+          type: integer
+        totalAmount:
+          type: number
+        outstandingCount:
+          type: integer
+        outstandingAmount:
+          type: number
+    OutstandingReport:
+      type: object
+      required: [totalCount, totalAmount, cheques]
+      properties:
+        totalCount:
+          type: integer
+        totalAmount:
+          type: number
+        cheques:
+          type: array
+          items:
+            $ref: '#/components/schemas/Cheque'
+    DashboardSummary:
+      type: object
+      required:
+        - totalCheques
+        - totalAmount
+        - outstandingCount
+        - outstandingAmount
+        - clearedCount
+        - clearedAmount
+        - cancelledCount
+        - accountCount
+        - departmentCount
+      properties:
+        totalCheques:
+          type: integer
+        totalAmount:
+          type: number
+        outstandingCount:
+          type: integer
+        outstandingAmount:
+          type: number
+        clearedCount:
+          type: integer
+        clearedAmount:
+          type: number
+        cancelledCount:
+          type: integer
+        accountCount:
+          type: integer
+        departmentCount:
+          type: integer
