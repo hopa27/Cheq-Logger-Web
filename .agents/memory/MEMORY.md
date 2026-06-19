@@ -3,3 +3,4 @@
 - [First-user-admin bootstrap](rbac-bootstrap.md) — count-then-insert admin promotion is race-prone; serialize with a transaction-scoped `pg_advisory_xact_lock`.
 - [replit-auth-web as composite lib](api-codegen-quirks.md) — when referenced via tsconfig it needs composite:true and an `env.d.ts` declaring `import.meta.env`.
 - [react-day-picker v9 API](react-day-picker-v9.md) — repo is on v9; v8 calendar patterns (IconLeft/Caption, head_row/day_selected classNames) fail typecheck — use v9 keys or hand-build views.
+- [SQL LEFT JOIN reports → client-side](sql-to-clientside-reports.md) — pre-seed all master rows when porting LEFT JOIN reports to browser aggregation, else zero-activity rows vanish.

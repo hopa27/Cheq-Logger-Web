@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useGetDepartmentsReport } from "@workspace/api-client-react";
+import { useGetDepartmentsReport } from "@/lib/local-data";
 import { useDateRange } from "@/lib/date-context";
 import { DataGrid, DataGridHeader, DataGridRow, DataGridHead, DataGridBody, DataGridCell } from "@/components/ui/data-grid";
 import { format } from "date-fns";

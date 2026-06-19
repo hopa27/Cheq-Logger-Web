@@ -1,4 +1,4 @@
-import { useGetDashboardSummary } from "@workspace/api-client-react";
+import { useGetDashboardSummary } from "@/lib/local-data";
 import { MdFormatListNumbered, MdErrorOutline, MdCheckCircleOutline, MdHighlightOff } from "react-icons/md";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";

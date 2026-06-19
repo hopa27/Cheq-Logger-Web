@@ -6,7 +6,7 @@ import {
   useListDepartments, 
   useGetMyProfile,
   ChequeStatus
-} from "@workspace/api-client-react";
+} from "@/lib/local-data";
 import { useDateRange } from "@/lib/date-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

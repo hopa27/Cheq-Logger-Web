@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAuth } from "@workspace/replit-auth-web";
+import { useAuth } from "@/lib/local-auth";
 import { Button } from "./ui/button";
 import { useLocation } from "wouter";
 import logoUrl from "@/assets/logo.svg";

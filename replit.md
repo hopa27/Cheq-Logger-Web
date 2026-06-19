@@ -1,54 +1,46 @@
 # CHEQ Logger
 
-An internal web app for logging cheques and running cheque reports. It replaces a legacy Windows desktop tool (and its Citrix delivery) with single sign-on and role-based access. Staff pick a date range, then view Accounts / Department / Outstanding reports and create or amend individual cheques.
+An internal web app for logging cheques and running cheque reports. It replaces a legacy Windows desktop tool (and its Citrix delivery). Staff pick a date range, then view Accounts / Department / Outstanding reports and create or amend individual cheques.
+
+This is now a **fully static, client-side web app** (no API server, database, or SSO). All data lives in the browser (seed data + `localStorage`) and authentication is a client-side demo gate. It can be published as a static website.
 
 ## Run & Operate
 
 - `pnpm --filter @workspace/cheq-logger run dev` — run the web app (Vite)
-- `pnpm --filter @workspace/api-server run dev` — run the API server
-- `pnpm run typecheck` — full typecheck across all packages
-- `pnpm run typecheck:libs` — build/typecheck composite libs only
-- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL`, `SESSION_SECRET` (auth)
+- `pnpm --filter @workspace/cheq-logger run build` — build the static site
+- `pnpm --filter @workspace/cheq-logger run typecheck` — typecheck the web app
+- `pnpm run typecheck` — full typecheck across all workspace packages
+- No environment variables are required.
 
 ## Stack
 
 - pnpm workspaces, Node.js 24, TypeScript 5.9
 - Web: React + Vite + wouter + TanStack Query + shadcn/ui
-- API: Express 5
-- DB: PostgreSQL + Drizzle ORM
-- Auth: single sign-on (OpenID Connect) via `@workspace/replit-auth-web` + session cookies
-- Validation: Zod (`zod/v4`), `drizzle-zod`
-- API codegen: Orval (from OpenAPI spec)
+- Data: client-side store (seed data + `localStorage`); no backend
+- Auth: client-side demo gate (no real SSO/OIDC)
 
 ## Where things live
 
-- API contract (source of truth): `lib/api-spec/openapi.yaml` — regenerate hooks/schemas after edits
-- Generated React Query hooks + types: `@workspace/api-client-react`
-- Generated Zod schemas (server validation): `@workspace/api-zod`
-- DB schema: `lib/db/src/schema/` (`auth.ts`, `accounts.ts`, `departments.ts`, `cheques.ts`)
-- Auth web hook: `lib/replit-auth-web` (`useAuth()`)
-- API routes: `artifacts/api-server/src/routes/` (one file per resource)
-- RBAC middleware: `artifacts/api-server/src/lib/permissions.ts`
+- Client data store (seed data + localStorage CRUD): `artifacts/cheq-logger/src/lib/store.ts`
+- Data hooks (TanStack Query wrappers over the store) + query-key helpers + `ChequeStatus`: `artifacts/cheq-logger/src/lib/local-data.ts`
+- Client demo auth (`useAuth`, `AuthProvider`): `artifacts/cheq-logger/src/lib/local-auth.tsx`
+- Date range context: `artifacts/cheq-logger/src/lib/date-context.tsx`
 - Frontend pages: `artifacts/cheq-logger/src/pages/`, theme in `src/index.css`
 
 ## Architecture decisions
 
-- Roles (`admin`/`editor`/`viewer`) live on the `users` table as a `role` column; the auth user table is otherwise managed by the auth template. `canEdit` = editor|admin, `canManage` = admin.
-- The very first user to sign in is promoted to `admin` (serialized by a transaction-scoped Postgres advisory lock so concurrent first sign-ins can't both win). Roles are never overwritten on subsequent logins.
-- RBAC is enforced server-side (`requireEdit` for cheque create/amend, `requireManage` for accounts/departments). The UI shows all controls but disables gated actions per the user's "all options active" requirement.
-- Cheque amounts are stored as `numeric` and converted to numbers in API responses; dates are stored as `date` and sent/received as strings.
-- Cheque update uses HTTP `PATCH /cheques/:id` to match the generated client.
-- Date query params are coerced to `Date` before Zod validation (generated query schemas use non-coercing `z.date()`).
+- The app has no server. Data hooks return data synchronously from a `localStorage`-backed store via TanStack Query, so existing `invalidateQueries` calls still refresh views. The store is seeded once (3 accounts, 4 departments, 8 cheques dated in the current month) under key `cheq_logger_db_v1`.
+- Reports and the dashboard summary are derived client-side from the cheque/account/department data.
+- Auth is a one-click client-side demo: signing in sets a flag in `localStorage` (`cheq_logger_auth_v1`); the demo user is always `admin`, so `canEdit` and `canManage` are true and every feature is usable. Logout clears the flag.
+- Cheque amounts are numbers; dates are `yyyy-MM-dd` strings.
 
 ## Product
 
-- Sign-in gate (SSO, no password form).
+- Sign-in gate (client-side demo, one click — no password form).
 - Dashboard with summary metrics and the legacy "Menu" workflow (date range + Accounts / Dept / O/S Cheques / New-Amend).
 - Cheque register with filters (date range, account, department, status, search), plus create/amend.
 - Reports: by account, by department, and outstanding cheques — all driven by a persistent date range.
-- Admin page to manage accounts and departments (admin only).
+- Admin page to manage accounts and departments.
 
 ## User preferences
 
@@ -56,12 +48,10 @@ An internal web app for logging cheques and running cheque reports. It replaces 
 - Minimal, clean style; keep all menu options visible/active (gate actions by role, don't hide them).
 - Do not use emojis in the UI.
 
-## Gotchas
+## History
 
-- Edit `lib/api-spec/openapi.yaml` first, then run codegen — do not hand-edit generated files.
-- After lib changes, run `pnpm run typecheck:libs` before leaf artifact typechecks.
-- `lib/replit-auth-web` is a composite lib; it needs `import.meta.env` typing (see `src/env.d.ts`).
+- Originally a full-stack app (Express API + PostgreSQL/Drizzle + Replit Auth SSO + OpenAPI codegen). On request, it was converted to a static client-side app: the `api-server` artifact and the `api-spec`, `api-client-react`, `api-zod`, `db`, and `replit-auth-web` libraries were removed, and the frontend was rewired to the local store/auth modules above.
 
 ## Pointers
 
-- See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details
+- See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details.

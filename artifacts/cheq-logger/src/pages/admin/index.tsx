@@ -7,7 +7,7 @@ import {
   useGetMyProfile,
   getListAccountsQueryKey,
   getListDepartmentsQueryKey
-} from "@workspace/api-client-react";
+} from "@/lib/local-data";
 import { useQueryClient } from "@tanstack/react-query";
 import { DataGrid, DataGridHeader, DataGridRow, DataGridHead, DataGridBody, DataGridCell } from "@/components/ui/data-grid";
 import { Input } from "@/components/ui/input";

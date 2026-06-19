@@ -14,7 +14,7 @@ import {
   getGetDepartmentsReportQueryKey,
   getGetOutstandingReportQueryKey,
   ChequeStatus
-} from "@workspace/api-client-react";
+} from "@/lib/local-data";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
