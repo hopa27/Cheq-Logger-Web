@@ -1,25 +1,8 @@
 import { useLocation } from "wouter";
 import { useDateRange } from "@/lib/date-context";
 import { DatePicker } from "@/components/ui/date-picker";
+import { Button } from "@/components/ui/button";
 import { MdPrint, MdNoteAdd } from "react-icons/md";
-
-interface MenuButtonProps {
-  icon: React.ReactNode;
-  label: string;
-  onClick: () => void;
-}
-
-function MenuButton({ icon, label, onClick }: MenuButtonProps) {
-  return (
-    <button
-      onClick={onClick}
-      className="w-full flex items-center gap-4 px-6 py-4 bg-white border border-[#BBBBBB] rounded-[6px] text-[#00263e] font-['Livvic'] font-semibold text-[18px] hover:bg-[#eaf2f8] hover:border-[#00263e] transition-all shadow-sm text-left"
-    >
-      <span className="text-[#00263e] flex-shrink-0">{icon}</span>
-      {label}
-    </button>
-  );
-}
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
@@ -49,26 +32,18 @@ export default function Dashboard() {
           <div className="h-px bg-[#e0e0e0]" />
 
           <div className="space-y-3">
-            <MenuButton
-              icon={<MdPrint size={22} />}
-              label="Accounts"
-              onClick={() => setLocation("/reports/accounts")}
-            />
-            <MenuButton
-              icon={<MdPrint size={22} />}
-              label="Dept"
-              onClick={() => setLocation("/reports/departments")}
-            />
-            <MenuButton
-              icon={<MdPrint size={22} />}
-              label="O/S Cheques"
-              onClick={() => setLocation("/reports/outstanding")}
-            />
-            <MenuButton
-              icon={<MdNoteAdd size={22} />}
-              label="New / Amend"
-              onClick={() => setLocation("/cheques")}
-            />
+            <Button variant="secondary" size="lg" className="w-full justify-start gap-3" onClick={() => setLocation("/reports/accounts")}>
+              <MdPrint size={20} />Accounts
+            </Button>
+            <Button variant="secondary" size="lg" className="w-full justify-start gap-3" onClick={() => setLocation("/reports/departments")}>
+              <MdPrint size={20} />Dept
+            </Button>
+            <Button variant="secondary" size="lg" className="w-full justify-start gap-3" onClick={() => setLocation("/reports/outstanding")}>
+              <MdPrint size={20} />O/S Cheques
+            </Button>
+            <Button variant="secondary" size="lg" className="w-full justify-start gap-3" onClick={() => setLocation("/cheques")}>
+              <MdNoteAdd size={20} />New / Amend
+            </Button>
           </div>
         </div>
       </div>
