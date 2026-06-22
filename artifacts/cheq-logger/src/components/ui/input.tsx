@@ -24,7 +24,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           {...props}
         />
         {suffixIcon && (
-          <div className="absolute right-0 top-0 h-[44px] flex items-center pr-3">
+          <div className="absolute right-0 top-0 h-full flex items-center pr-3">
             <div className="h-6 w-[1px] bg-[#BBBBBB] mr-2" />
             <div className={cn("text-[20px]", isError ? "text-[#d72714]" : "text-[#006cf4]")}>
               {suffixIcon}
