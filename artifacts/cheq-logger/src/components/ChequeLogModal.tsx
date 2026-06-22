@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import {
@@ -84,7 +84,18 @@ export default function ChequeLogModal({ open, onClose }: Props) {
   const [form, setForm] = useState<FormState>(emptyForm());
   const [signedBy, setSignedBy] = useState<string>("");
   const [pendingLogRef, setPendingLogRef] = useState("");
+  const [suggestOpen, setSuggestOpen] = useState(false);
   const wantLastRef = React.useRef(false);
+
+  const suggestions = form.findQuery.trim().length > 0
+    ? cheques.filter(c => {
+        const q = form.findQuery.trim().toLowerCase();
+        return c.logRef.includes(q)
+          || c.chequeNumber.toLowerCase().includes(q)
+          || c.payee.toLowerCase().includes(q)
+          || (c.notes ?? "").toLowerCase().includes(q);
+      }).slice(0, 8)
+    : [];
 
   const currentCheque = !isNew && cheques.length > 0 ? cheques[currentIndex] : null;
 
@@ -262,12 +273,40 @@ export default function ChequeLogModal({ open, onClose }: Props) {
         {/* Form body */}
         <div className="bg-white px-5 py-5 space-y-4">
 
-          <div>
+          <div className="relative">
             <label className={LBL}>Find Cheque</label>
-            <Input className={INPUT} placeholder="Enter cheque number and press Enter"
+            <Input
+              className={INPUT}
+              placeholder="Type log ref, slip no, drawer…"
               value={form.findQuery}
               onChange={e => set("findQuery")(e.target.value)}
-              onKeyDown={handleFind} />
+              onKeyDown={handleFind}
+              onFocus={() => setSuggestOpen(true)}
+              onBlur={() => setTimeout(() => setSuggestOpen(false), 120)}
+              autoComplete="off"
+            />
+            {suggestOpen && suggestions.length > 0 && (
+              <ul className="absolute z-50 left-0 right-0 top-full mt-1 bg-white border border-[#BBBBBB] rounded-[6px] shadow-lg max-h-56 overflow-y-auto">
+                {suggestions.map((c) => (
+                  <li
+                    key={c.id}
+                    onMouseDown={() => {
+                      const idx = cheques.findIndex(x => x.id === c.id);
+                      if (idx >= 0) loadCheque(idx);
+                      set("findQuery")("");
+                      setSuggestOpen(false);
+                    }}
+                    className="flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-[#e8f0fe] text-[13px] font-['Mulish'] border-b last:border-b-0 border-[#f0f0f0]"
+                  >
+                    <span className="font-bold text-[#00263e] w-[72px] shrink-0">{c.logRef}</span>
+                    <span className="text-[#4a4a49] truncate flex-1">{c.payee || <span className="text-[#bbb] italic">No drawer</span>}</span>
+                    <span className="text-[#006cf4] font-semibold shrink-0">
+                      {c.amount ? `£${c.amount.toLocaleString("en-GB", { minimumFractionDigits: 2 })}` : "—"}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
