@@ -67,7 +67,7 @@ interface DB {
   seq: number;
 }
 
-const STORAGE_KEY = "cheq_logger_db_v2";
+const STORAGE_KEY = "cheq_logger_db_v3";
 
 function seed(): DB {
   const now = new Date();
@@ -81,8 +81,18 @@ function seed(): DB {
   ];
 
   const departments: Department[] = [
-    { id: 1, code: "ACCTS", name: "Accounts", active: true },
-    { id: 2, code: "CPA", name: "CPA", active: true },
+    { id:  1, code: "ACCOUNTS",     name: "ACCOUNTS",     active: true },
+    { id:  2, code: "CPA",          name: "CPA",          active: true },
+    { id:  3, code: "ACC",          name: "ACC",          active: true },
+    { id:  4, code: "ACCOUNTS_F",   name: "ACCOUNTS_F",   active: true },
+    { id:  5, code: "ACCOUNTS_G",   name: "ACCOUNTS_G",   active: true },
+    { id:  6, code: "ACCOUNTS-PRP", name: "ACCOUNTS-PRP", active: true },
+    { id:  7, code: "ADMIN",        name: "ADMIN",        active: true },
+    { id:  8, code: "BQU",          name: "BQU",          active: true },
+    { id:  9, code: "CPA-760",      name: "CPA-760",      active: true },
+    { id: 10, code: "CPA-830",      name: "CPA-830",      active: true },
+    { id: 11, code: "CPA-926",      name: "CPA-926",      active: true },
+    { id: 12, code: "CPA-PRP",      name: "CPA-PRP",      active: true },
   ];
 
   const cheques: ChequeRecord[] = [
