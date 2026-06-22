@@ -4,8 +4,6 @@ import { format } from "date-fns";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -27,7 +25,13 @@ import {
   getListChequesQueryKey,
   getGetDashboardSummaryQueryKey,
 } from "@/lib/local-data";
-import { MdSkipPrevious, MdSkipNext, MdNavigateBefore, MdNavigateNext, MdNoteAdd } from "react-icons/md";
+import {
+  MdSkipPrevious,
+  MdSkipNext,
+  MdNavigateBefore,
+  MdNavigateNext,
+  MdNoteAdd,
+} from "react-icons/md";
 
 interface FormState {
   findQuery: string;
@@ -62,9 +66,6 @@ export default function ChequeLogModal({ open, onClose }: Props) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const today = format(new Date(), "yyyy-MM-dd");
-  const startOfMonth = format(new Date(new Date().getFullYear(), new Date().getMonth(), 1), "yyyy-MM-dd");
-
   const { data: cheques = [] } = useListCheques({ startDate: "2000-01-01", endDate: "2099-12-31" });
   const { data: accounts = [] } = useListAccounts();
   const { data: departments = [] } = useListDepartments();
@@ -96,16 +97,10 @@ export default function ChequeLogModal({ open, onClose }: Props) {
   }, [cheques]);
 
   useEffect(() => {
-    if (open && cheques.length > 0 && !isNew) {
-      loadCheque(0);
-    }
+    if (open && cheques.length > 0 && !isNew) loadCheque(0);
   }, [open, cheques.length]);
 
-  const handleNew = () => {
-    setForm(emptyForm());
-    setIsNew(true);
-  };
-
+  const handleNew = () => { setForm(emptyForm()); setIsNew(true); };
   const handleFirst = () => loadCheque(0);
   const handlePrev = () => loadCheque(Math.max(0, currentIndex - 1));
   const handleNext = () => loadCheque(Math.min(cheques.length - 1, currentIndex + 1));
@@ -155,77 +150,89 @@ export default function ChequeLogModal({ open, onClose }: Props) {
     }
   };
 
-  const label = "block text-[13px] font-semibold font-['Livvic'] text-[#002f5c] mb-1";
-  const inputCls = "h-9 text-[13px] font-['Mulish'] border-[#BBBBBB] focus-visible:ring-[#00263e]";
-  const navBtn = "h-8 w-8 p-0 text-white bg-[#00263e] hover:bg-[#003d5c] rounded-[4px] flex items-center justify-center";
+  const position = cheques.length > 0
+    ? `${isNew ? "New" : currentIndex + 1} / ${cheques.length}`
+    : "0 / 0";
 
-  const position = cheques.length > 0 ? `${isNew ? "New" : currentIndex + 1} of ${cheques.length}` : "0";
+  const LBL = "block font-['Livvic'] font-semibold text-[#002f5c] text-[13px] mb-1";
+  const INPUT = "h-9 font-['Mulish'] text-[13px] border-[#BBBBBB] rounded-[6px] focus-visible:ring-[#006cf4]/40";
 
   return (
     <Dialog open={open} onOpenChange={v => !v && onClose()}>
-      <DialogContent className="p-0 gap-0 max-w-[520px] rounded-[8px] overflow-hidden border border-[#BBBBBB] shadow-xl">
+      <DialogContent className="p-0 gap-0 max-w-[540px] rounded-[8px] overflow-hidden border border-[#BBBBBB] shadow-2xl [&>button]:hidden">
 
-        <DialogHeader className="bg-[#00263e] px-4 py-3 rounded-t-[8px]">
-          <DialogTitle className="font-['Livvic'] text-white text-[16px] font-semibold">
+        {/* Header — navy band with title + toolbar */}
+        <div className="bg-[#00263e] px-5 py-3 flex items-center justify-between gap-4">
+          <span className="font-['Livvic'] text-white text-[16px] font-semibold flex-shrink-0">
             Accounts Cheque Log
-          </DialogTitle>
-        </DialogHeader>
+          </span>
 
-        <div className="bg-[#f0f0f0] px-4 py-2 flex items-center gap-2 border-b border-[#BBBBBB]">
-          <div className="bg-[#00263e] text-white text-[13px] font-['Mulish'] font-bold px-3 h-8 flex items-center rounded-[4px] min-w-[60px] justify-center">
-            {position}
+          {/* position badge */}
+          <span className="font-['Mulish'] text-white/70 text-[12px] flex-shrink-0">{position}</span>
+
+          {/* toolbar buttons */}
+          <div className="flex items-center gap-1 ml-auto">
+            <Button variant="ghost" size="icon"
+              className="h-8 w-8 text-white hover:bg-white/10 hover:text-white"
+              onClick={handleNew} title="New">
+              <MdNoteAdd size={18} />
+            </Button>
+            <div className="w-px h-5 bg-white/20 mx-1" />
+            <Button variant="ghost" size="icon"
+              className="h-8 w-8 text-white hover:bg-white/10 hover:text-white"
+              onClick={handleFirst} disabled={!cheques.length} title="First">
+              <MdSkipPrevious size={18} />
+            </Button>
+            <Button variant="ghost" size="icon"
+              className="h-8 w-8 text-white hover:bg-white/10 hover:text-white"
+              onClick={handlePrev} disabled={!cheques.length || currentIndex === 0} title="Previous">
+              <MdNavigateBefore size={18} />
+            </Button>
+            <Button variant="ghost" size="icon"
+              className="h-8 w-8 text-white hover:bg-white/10 hover:text-white"
+              onClick={handleNext} disabled={!cheques.length || currentIndex >= cheques.length - 1} title="Next">
+              <MdNavigateNext size={18} />
+            </Button>
+            <Button variant="ghost" size="icon"
+              className="h-8 w-8 text-white hover:bg-white/10 hover:text-white"
+              onClick={handleLast} disabled={!cheques.length} title="Last">
+              <MdSkipNext size={18} />
+            </Button>
           </div>
-          <button className={navBtn} onClick={handleNew} title="New">
-            <MdNoteAdd size={18} />
-          </button>
-          <div className="w-px h-6 bg-[#BBBBBB] mx-1" />
-          <button className={navBtn} onClick={handleFirst} title="First" disabled={cheques.length === 0}>
-            <MdSkipPrevious size={18} />
-          </button>
-          <button className={navBtn} onClick={handlePrev} title="Previous" disabled={cheques.length === 0 || currentIndex === 0}>
-            <MdNavigateBefore size={18} />
-          </button>
-          <button className={navBtn} onClick={handleNext} title="Next" disabled={cheques.length === 0 || currentIndex >= cheques.length - 1}>
-            <MdNavigateNext size={18} />
-          </button>
-          <button className={navBtn} onClick={handleLast} title="Last" disabled={cheques.length === 0}>
-            <MdSkipNext size={18} />
-          </button>
         </div>
 
-        <div className="bg-white px-5 py-4 space-y-4">
+        {/* Form body */}
+        <div className="bg-white px-5 py-5 space-y-4">
 
           <div>
-            <label className={label}>Find Cheque</label>
-            <Input
-              className={inputCls}
-              placeholder="Enter cheque number and press Enter"
+            <label className={LBL}>Find Cheque</label>
+            <Input className={INPUT} placeholder="Enter cheque number and press Enter"
               value={form.findQuery}
               onChange={e => set("findQuery")(e.target.value)}
-              onKeyDown={handleFind}
-            />
+              onKeyDown={handleFind} />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className={label}>Date Rec'd</label>
+              <label className={LBL}>Date Rec'd</label>
               <DatePicker value={form.issueDate} onChange={val => set("issueDate")(val)} />
             </div>
             <div>
-              <label className={label}>Signed / Posted</label>
-              <Input className={inputCls + " bg-[#e8f0e8] font-bold text-[#00263e]"} value="Admin" readOnly />
+              <label className={LBL}>Signed / Posted</label>
+              <Input className={INPUT + " bg-[#f5f7fa] text-[#00263e] font-semibold"} value="Admin" readOnly />
             </div>
           </div>
 
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <label className={label}>Pay-in Slip No</label>
-              <Input className={inputCls} value={form.chequeNumber} onChange={e => set("chequeNumber")(e.target.value)} placeholder="e.g. CHQ-001" />
+              <label className={LBL}>Pay-in Slip No</label>
+              <Input className={INPUT} value={form.chequeNumber}
+                onChange={e => set("chequeNumber")(e.target.value)} placeholder="CHQ-001" />
             </div>
             <div>
-              <label className={label}>Department</label>
+              <label className={LBL}>Department</label>
               <Select value={form.departmentId} onValueChange={set("departmentId")}>
-                <SelectTrigger className={inputCls}>
+                <SelectTrigger className={INPUT}>
                   <SelectValue placeholder="Select..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -236,9 +243,9 @@ export default function ChequeLogModal({ open, onClose }: Props) {
               </Select>
             </div>
             <div>
-              <label className={label}>Account Credited</label>
+              <label className={LBL}>Account Credited</label>
               <Select value={form.accountId} onValueChange={set("accountId")}>
-                <SelectTrigger className={inputCls}>
+                <SelectTrigger className={INPUT}>
                   <SelectValue placeholder="Select..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -251,20 +258,22 @@ export default function ChequeLogModal({ open, onClose }: Props) {
           </div>
 
           <div>
-            <label className={label}>Drawer</label>
-            <Input className={inputCls} value={form.payee} onChange={e => set("payee")(e.target.value)} placeholder="Payee / drawer name" />
+            <label className={LBL}>Drawer</label>
+            <Input className={INPUT} value={form.payee}
+              onChange={e => set("payee")(e.target.value)} placeholder="Payee / drawer name" />
           </div>
 
           <div>
-            <label className={label}>Policy Name / Cheque Details</label>
-            <Input className={inputCls} value={form.notes} onChange={e => set("notes")(e.target.value)} placeholder="Notes or cheque description" />
+            <label className={LBL}>Policy Name / Cheque Details</label>
+            <Input className={INPUT} value={form.notes}
+              onChange={e => set("notes")(e.target.value)} placeholder="Notes or cheque description" />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className={label}>Status</label>
+              <label className={LBL}>Status</label>
               <Select value={form.status} onValueChange={set("status")}>
-                <SelectTrigger className={inputCls}>
+                <SelectTrigger className={INPUT}>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -275,21 +284,21 @@ export default function ChequeLogModal({ open, onClose }: Props) {
               </Select>
             </div>
             <div>
-              <label className={label}>Cheque Amount</label>
-              <Input
-                className={inputCls + " text-right font-bold text-[#d72714]"}
-                type="number"
-                step="0.01"
+              <label className={LBL}>Cheque Amount</label>
+              <Input className={INPUT + " text-right font-bold text-[#d72714]"}
+                type="number" step="0.01"
                 value={form.amount}
                 onChange={e => set("amount")(e.target.value)}
-                placeholder="0.00"
-              />
+                placeholder="0.00" />
             </div>
           </div>
         </div>
 
-        <div className="bg-[#f0f0f0] px-5 py-3 border-t border-[#BBBBBB] flex justify-end gap-2">
-          <Button variant="secondary" size="sm" onClick={handleSave} disabled={createCheque.isPending || updateCheque.isPending}>
+        {/* Footer */}
+        <div className="bg-[#f5f7fa] border-t border-[#BBBBBB] px-5 py-3 flex justify-end gap-2">
+          <Button variant="secondary" size="sm"
+            onClick={handleSave}
+            disabled={createCheque.isPending || updateCheque.isPending}>
             Save
           </Button>
           <Button variant="secondary" size="sm" onClick={onClose}>
