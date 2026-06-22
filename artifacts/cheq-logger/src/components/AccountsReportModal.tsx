@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { format } from "date-fns";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -31,8 +32,11 @@ function ExportDialog({
 }: { open: boolean; onCancel: () => void; onOk: (fmt: string) => void }) {
   const [fmt, setFmt] = useState("pdf");
   if (!open) return null;
-  return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center">
+
+  // Must portal to document.body — rendering inside a Radix <Dialog> traps
+  // focus and blocks pointer events on any overlay that isn't DialogContent.
+  return createPortal(
+    <div className="fixed inset-0 z-[200] flex items-center justify-center">
       <div className="absolute inset-0 bg-black/50" />
       <div className="relative bg-white rounded-[8px] overflow-hidden border border-[#BBBBBB] shadow-2xl w-[400px]">
         {/* LV header */}
@@ -84,7 +88,8 @@ function ExportDialog({
           </Button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
