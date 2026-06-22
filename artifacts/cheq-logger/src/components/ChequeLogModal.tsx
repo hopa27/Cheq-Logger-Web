@@ -108,6 +108,14 @@ export default function ChequeLogModal({ open, onClose }: Props) {
     if (open && cheques.length > 0 && !isNew) loadCheque(0);
   }, [open, cheques.length]);
 
+  // Auto-select account 843 whenever the field is blank and accounts are loaded
+  useEffect(() => {
+    if (!form.accountId && accounts.length > 0) {
+      const acct843 = accounts.find(a => a.code === "843");
+      if (acct843) set("accountId")(String(acct843.id));
+    }
+  }, [accounts, form.accountId]);
+
   const handleNew = () => { setForm(emptyForm()); setIsNew(true); };
   const handleFirst = () => loadCheque(0);
   const handlePrev = () => loadCheque(Math.max(0, currentIndex - 1));
@@ -280,7 +288,7 @@ export default function ChequeLogModal({ open, onClose }: Props) {
                   <SelectValue placeholder="Select..." />
                 </SelectTrigger>
                 <SelectContent>
-                  {accounts.map(a => (
+                  {accounts.filter(a => a.code === "843").map(a => (
                     <SelectItem key={a.id} value={String(a.id)}>{a.code}</SelectItem>
                   ))}
                 </SelectContent>
