@@ -7,7 +7,7 @@ export default function Header({ title }: { title?: string }) {
 
   let displayTitle = title;
   if (!displayTitle) {
-    if (location === '/') displayTitle = "";
+    if (location === '/') displayTitle = "Menu";
     else if (location.startsWith('/cheques')) displayTitle = "Cheque Register";
     else if (location.startsWith('/reports/accounts')) displayTitle = "Accounts Report";
     else if (location.startsWith('/reports/departments')) displayTitle = "Departments Report";

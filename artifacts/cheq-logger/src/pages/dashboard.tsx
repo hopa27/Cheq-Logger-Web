@@ -29,10 +29,6 @@ export default function Dashboard() {
     <div className="flex justify-center items-start pt-8">
       <div className="w-[360px] rounded-[8px] overflow-hidden shadow-lg border border-[#BBBBBB]">
 
-        <div className="bg-[#00263e] px-6 py-4">
-          <h2 className="font-['Livvic'] text-[20px] font-semibold text-white tracking-wide">Menu</h2>
-        </div>
-
         <div className="bg-white px-6 py-6 space-y-6">
 
           <div className="space-y-4">
