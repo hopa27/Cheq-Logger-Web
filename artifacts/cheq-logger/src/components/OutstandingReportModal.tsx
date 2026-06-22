@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { format } from "date-fns";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useDateRange } from "@/lib/date-context";
@@ -152,7 +152,20 @@ function TableRows({ rows }: { rows: DummyRow[] }) {
 export default function OutstandingReportModal({ open, onClose }: Props) {
   const { startDate, endDate } = useDateRange();
   const printRef = useRef<HTMLDivElement>(null);
-  const [zoom, setZoom] = useState(75);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [zoom, setZoom] = useState(100);
+
+  // Auto-fit zoom to modal width whenever the modal opens
+  useEffect(() => {
+    if (!open) return;
+    requestAnimationFrame(() => {
+      if (scrollRef.current) {
+        const availW = scrollRef.current.clientWidth - 48; // subtract px-6 padding
+        const fit = Math.round((availW / A4_W) * 100);
+        setZoom(Math.min(Math.max(fit, 50), 150));
+      }
+    });
+  }, [open]);
 
   const handlePrint = () => {
     const el = printRef.current;
@@ -256,6 +269,7 @@ export default function OutstandingReportModal({ open, onClose }: Props) {
 
         {/* Scrollable preview area */}
         <div
+          ref={scrollRef}
           className="bg-[#808080] overflow-auto"
           style={{ maxHeight: "68vh" }}
         >
