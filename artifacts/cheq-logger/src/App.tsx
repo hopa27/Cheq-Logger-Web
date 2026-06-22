@@ -9,8 +9,6 @@ import Dashboard from "@/pages/dashboard";
 import NotFound from "@/pages/not-found";
 import ChequeList from "@/pages/cheques/list";
 import ChequeForm from "@/pages/cheques/form";
-import DepartmentsReport from "@/pages/reports/departments";
-import OutstandingReport from "@/pages/reports/outstanding";
 import Admin from "@/pages/admin/index";
 
 const queryClient = new QueryClient();
@@ -27,8 +25,6 @@ function App() {
                 <Route path="/cheques" component={ChequeList} />
                 <Route path="/cheques/new" component={ChequeForm} />
                 <Route path="/cheques/:id" component={ChequeForm} />
-                <Route path="/reports/departments" component={DepartmentsReport} />
-                <Route path="/reports/outstanding" component={OutstandingReport} />
                 <Route path="/admin" component={Admin} />
                 <Route component={NotFound} />
               </Switch>

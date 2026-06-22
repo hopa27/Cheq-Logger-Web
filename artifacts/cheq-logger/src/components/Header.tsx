@@ -10,8 +10,6 @@ export default function Header({ title }: { title?: string }) {
   if (!displayTitle) {
     if (location === '/') displayTitle = "Menu";
     else if (location.startsWith('/cheques')) displayTitle = "Cheque Register";
-    else if (location.startsWith('/reports/departments')) displayTitle = "Departments Report";
-    else if (location.startsWith('/reports/outstanding')) displayTitle = "Outstanding Cheques";
     else if (location.startsWith('/admin')) displayTitle = "Admin / Setup";
     else displayTitle = "CHEQ Logger";
   }
