@@ -33,6 +33,8 @@ import {
   MdNavigateNext,
   MdNoteAdd,
   MdClose,
+  MdEdit,
+  MdEditOff,
 } from "react-icons/md";
 
 interface FormState {
@@ -243,9 +245,10 @@ export default function ChequeLogModal({ open, onClose }: Props) {
                 <button
                   type="button"
                   onClick={() => setSignedBy(signedBy ? "" : "Admin")}
-                  className="lve-btn lve-btn-secondary shrink-0 !h-[44px] !rounded-[6px] !px-3 text-[12px] font-bold"
+                  title={signedBy ? "Unsign" : "Sign"}
+                  className="lve-btn lve-btn-secondary shrink-0 !h-[44px] !w-[44px] !rounded-[6px] !p-0 flex items-center justify-center"
                 >
-                  {signedBy ? "Unsign" : "Sign"}
+                  {signedBy ? <MdEditOff size={18} /> : <MdEdit size={18} />}
                 </button>
               </div>
             </div>
