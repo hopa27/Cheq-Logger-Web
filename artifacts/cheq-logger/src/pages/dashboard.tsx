@@ -11,6 +11,11 @@ export default function Dashboard() {
   const [modalOpen, setModalOpen] = useState(false);
   const [accountsOpen, setAccountsOpen] = useState(false);
 
+  const handlePreset = (start: string, end: string) => {
+    setStartDate(start);
+    setEndDate(end);
+  };
+
   return (
     <div className="flex justify-center items-start pt-8">
       <div className="w-[360px] rounded-[8px] overflow-hidden shadow-lg border border-[#BBBBBB]">
@@ -21,13 +26,13 @@ export default function Dashboard() {
               <label className="block font-['Livvic'] font-semibold text-[#002f5c] text-[15px] mb-1.5">
                 Start Date
               </label>
-              <DatePicker value={startDate} onChange={setStartDate} />
+              <DatePicker value={startDate} onChange={setStartDate} onPresetSelect={handlePreset} />
             </div>
             <div>
               <label className="block font-['Livvic'] font-semibold text-[#002f5c] text-[15px] mb-1.5">
                 End Date
               </label>
-              <DatePicker value={endDate} onChange={setEndDate} />
+              <DatePicker value={endDate} onChange={setEndDate} onPresetSelect={handlePreset} />
             </div>
           </div>
 
