@@ -18,8 +18,10 @@ export interface Department {
 
 export interface ChequeRecord {
   id: number;
+  logRef: string;
   chequeNumber: string;
   issueDate: string;
+  signedBy: string | null;
   payee: string;
   accountId: number;
   departmentId: number;
@@ -67,7 +69,7 @@ interface DB {
   seq: number;
 }
 
-const STORAGE_KEY = "cheq_logger_db_v3";
+const STORAGE_KEY = "cheq_logger_db_v4";
 
 function seed(): DB {
   const now = new Date();
@@ -96,16 +98,17 @@ function seed(): DB {
   ];
 
   const cheques: ChequeRecord[] = [
-    { id: 1,  chequeNumber: "1", issueDate: d(1),  payee: "",                accountId: 1, departmentId: 1, amount: 0,         status: "outstanding", clearedDate: null, notes: "",               policyRef: null    },
-    { id: 2,  chequeNumber: "1", issueDate: d(3),  payee: "clerical medical", accountId: 1, departmentId: 2, amount: 0,         status: "outstanding", clearedDate: null, notes: "Testmrbaaaae",   policyRef: "100004" },
-    { id: 3,  chequeNumber: "1", issueDate: d(3),  payee: "zurich",           accountId: 1, departmentId: 2, amount: 61310.42,  status: "outstanding", clearedDate: null, notes: "Testmrbaacbi",   policyRef: "100218" },
-    { id: 4,  chequeNumber: "2", issueDate: d(5),  payee: "PRUDENTIAL",       accountId: 1, departmentId: 2, amount: 28122.00,  status: "outstanding", clearedDate: null, notes: "Testmsbaaabc",   policyRef: "100012" },
-    { id: 5,  chequeNumber: "2", issueDate: d(6),  payee: "ZURICH",           accountId: 1, departmentId: 2, amount: 54695.20,  status: "outstanding", clearedDate: null, notes: "Testtdbaaaef",   policyRef: "100045" },
-    { id: 6,  chequeNumber: "3", issueDate: d(6),  payee: "CBS LTD",          accountId: 1, departmentId: 2, amount: 17330.00,  status: "cleared",     clearedDate: d(10), notes: "Testwrbaaajd",  policyRef: "100093" },
-    { id: 7,  chequeNumber: "4", issueDate: d(9),  payee: "prudential",       accountId: 1, departmentId: 2, amount: 11090.15,  status: "cleared",     clearedDate: d(14), notes: "Testmlbaaada",  policyRef: "100030" },
+    { id: 1, logRef: "31008389", chequeNumber: "1",  issueDate: "2008-01-09", signedBy: "SIPMT", payee: "clerical medical", accountId: 1, departmentId: 2, amount: 0,         status: "outstanding", clearedDate: null, notes: "Testmrbaaaae",  policyRef: "100004" },
+    { id: 2, logRef: "31008390", chequeNumber: "1",  issueDate: "2008-01-09", signedBy: "SIPMT", payee: "zurich",           accountId: 1, departmentId: 2, amount: 61310.42,  status: "outstanding", clearedDate: null, notes: "Testmrbaacbi",  policyRef: "100218" },
+    { id: 3, logRef: "31008391", chequeNumber: "",   issueDate: "2007-12-31", signedBy: "SIPMT", payee: "",                 accountId: 1, departmentId: 1, amount: 0,         status: "outstanding", clearedDate: null, notes: null,           policyRef: null     },
+    { id: 4, logRef: "31008393", chequeNumber: "2",  issueDate: "2008-01-10", signedBy: "SIPMT", payee: "PRUDENTIAL",       accountId: 1, departmentId: 2, amount: 28122.00,  status: "outstanding", clearedDate: null, notes: "Testmsbaaaabc", policyRef: "100012" },
+    { id: 5, logRef: "31008394", chequeNumber: "3",  issueDate: "2008-01-11", signedBy: "SIPMT", payee: "CBS LTD",          accountId: 1, departmentId: 2, amount: 17330.00,  status: "outstanding", clearedDate: null, notes: "Testwrbaaajd",  policyRef: "100093" },
+    { id: 6, logRef: "31008395", chequeNumber: "2",  issueDate: "2008-01-11", signedBy: "SIPMT", payee: "ZURICH",           accountId: 1, departmentId: 2, amount: 54695.20,  status: "outstanding", clearedDate: null, notes: "Testtdbaaaef",  policyRef: "100045" },
+    { id: 7, logRef: "31008400", chequeNumber: "4",  issueDate: "2008-01-14", signedBy: "SIPMT", payee: "prudential",       accountId: 1, departmentId: 2, amount: 11090.15,  status: "outstanding", clearedDate: null, notes: "Testmlbaaada",  policyRef: "100030" },
+    { id: 8, logRef: "31166764", chequeNumber: "",   issueDate: "2008-01-15", signedBy: "UAT5",  payee: "",                 accountId: 1, departmentId: 2, amount: 21212.00,  status: "outstanding", clearedDate: null, notes: null,           policyRef: null     },
   ];
 
-  return { accounts, departments, cheques, seq: 100 };
+  return { accounts, departments, cheques, seq: 31166765 };
 }
 
 function load(): DB {
@@ -207,7 +210,8 @@ export function getCheque(id: number): Cheque | undefined {
 export function createCheque(data: ChequeInput): Cheque {
   const db = load();
   const id = Math.max(0, ...db.cheques.map((c) => c.id)) + 1;
-  const record: ChequeRecord = { id, ...data };
+  const logRef = data.logRef || String(Math.max(31000000, ...db.cheques.map(c => parseInt(c.logRef, 10) || 0)) + 1);
+  const record: ChequeRecord = { id, ...data, logRef };
   db.cheques.push(record);
   save(db);
   return enrich(db, record);

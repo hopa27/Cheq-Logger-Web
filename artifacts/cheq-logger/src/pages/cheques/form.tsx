@@ -82,7 +82,9 @@ export default function ChequeForm() {
 
     try {
       const payload = {
+        logRef: isNew ? "" : (cheque?.logRef ?? ""),
         chequeNumber: formData.chequeNumber,
+        signedBy: cheque?.signedBy ?? null,
         accountId: Number(formData.accountId),
         departmentId: Number(formData.departmentId),
         payee: formData.payee,

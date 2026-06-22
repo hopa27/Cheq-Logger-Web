@@ -100,6 +100,7 @@ export default function ChequeLogModal({ open, onClose }: Props) {
       amount: c.amount ? String(c.amount) : "",
       status: c.status,
     });
+    setSignedBy(c.signedBy ?? "");
     setIsNew(false);
     setCurrentIndex(index);
   }, [cheques]);
@@ -126,7 +127,7 @@ export default function ChequeLogModal({ open, onClose }: Props) {
     if (e.key !== "Enter") return;
     const q = form.findQuery.trim().toLowerCase();
     if (!q) return;
-    const idx = cheques.findIndex(c => c.chequeNumber.toLowerCase().includes(q));
+    const idx = cheques.findIndex(c => c.logRef.includes(q) || c.chequeNumber.toLowerCase().includes(q));
     if (idx >= 0) loadCheque(idx);
     else toast({ title: "Not found", description: `No cheque matching "${q}".`, variant: "destructive" });
   };
@@ -140,8 +141,10 @@ export default function ChequeLogModal({ open, onClose }: Props) {
       return;
     }
     const data = {
+      logRef: isNew ? "" : (currentCheque?.logRef ?? ""),
       chequeNumber: form.chequeNumber,
       issueDate: form.issueDate,
+      signedBy: signedBy || null,
       accountId: Number(form.accountId),
       departmentId: Number(form.departmentId),
       payee: form.payee,
@@ -194,9 +197,9 @@ export default function ChequeLogModal({ open, onClose }: Props) {
 
         {/* Toolbar strip */}
         <div className="bg-[#f5f7fa] border-b border-[#BBBBBB] px-4 py-2 flex items-center gap-2">
-          {/* Cheque number badge — no label, left-anchored */}
+          {/* Log ref badge — no label, left-anchored */}
           <span className="font-['Mulish'] text-[13px] font-bold text-[#00263e] bg-white border border-[#BBBBBB] rounded-[6px] px-3 h-8 flex items-center min-w-[80px] select-none">
-            {form.chequeNumber || <span className="text-[#999]">—</span>}
+            {isNew ? <span className="text-[#999]">New</span> : (currentCheque?.logRef || <span className="text-[#999]">—</span>)}
           </span>
           <div className="flex-1" />
           <button type="button" onClick={handleNew} title="New"
