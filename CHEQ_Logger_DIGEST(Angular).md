@@ -124,27 +124,13 @@ Used by both the Dashboard pickers and the `AccountsReportModal` to scope its re
 
 ### 3.1 Dashboard / Menu (`Dashboard`, `src/pages/dashboard.tsx`, route `/`)
 
-The only screen reachable via the UI. Displayed as a centred card (`w-[360px]`).
+The only screen reachable via the UI. Displayed as a centred card (`w-[360px]`) on a light background, with the global navy Header above and white Footer below.
 
-```
-+--------------------------------------------------+
-|  CHEQ Logger                     [ Close ][ Logout ] |  ← Header (navy)
-+--------------------------------------------------+
-|                                                  |
-|  +--------------------------------------------+  |
-|  |  Start Date                                |  |
-|  |  [ 03/12/2025  [cal] ]                     |  |
-|  |  End Date                                  |  |
-|  |  [ 12/06/2026  [cal] ]                     |  |
-|  |  ─────────────────────────────────────     |  |
-|  |  [ Print icon ] Accounts        (secondary)|  |
-|  |  [ Note icon  ] New / Amend     (secondary)|  |
-|  +--------------------------------------------+  |
-|                                                  |
-+--------------------------------------------------+
-|  LV= logo              Company Address           |  ← Footer
-+--------------------------------------------------+
-```
+The card contains three sections in order:
+
+1. **Date range pickers** — Start Date and End Date, each a `DatePicker` component, stacked vertically with Livvic bold labels in title_blue.
+2. **Horizontal rule** — `h-px bg-[#e0e0e0]` divider.
+3. **Action buttons** — two full-width secondary buttons, stacked vertically, left-aligned icon + label.
 
 #### 3.1.1 Date Range pickers
 
@@ -198,38 +184,12 @@ presets (Dashboard only, below calendar):
 
 Full-screen overlay dialog. Triggered from Dashboard → **New / Amend**. Loads all cheques (date range `2000-01-01 → 2099-12-31`). Initial display shows the first cheque (index 0) sorted ascending by `logRef`.
 
-```
-+-------------------------------------------------------------------+
-| Accounts Cheque Log                                    [ × ]      |  ← navy title bar
-+-------------------------------------------------------------------+
-| [Ref badge: 31008389]           [New]  [|<][<] 1 of 8 [>][>|]    |  ← toolbar (white)
-+-------------------------------------------------------------------+
-| Find Cheque:  [ Type log ref, slip no, drawer…                ]   |
-|               ┌──────────────────────────────────────────────┐   |
-|               │ 31008389  clerical medical         £0.00      │   |  ← suggestion list
-|               │ 31008390  zurich               £61,310.42     │   |     (up to 8 rows)
-|               └──────────────────────────────────────────────┘   |
-|                                                                   |
-|  Date Rec'd           Signed / Posted                            |
-|  [ 09/01/2008  [cal]] [ SIPMT (readonly) ]  [ Sign / Unsign btn ]|
-|                                                                   |
-|  Pay-in Slip No    Department          Account Credited           |
-|  [ 1             ] [ CPA          [v]] [ 843          [v]]        |
-|                                                                   |
-|  Drawer               [ LV= quick-fill btn ]                     |
-|  [ clerical medical                        ]                      |
-|                                                                   |
-|  Policy Name / Cheque Details                                     |
-|  [ Testmrbaaaae                            ]                      |
-|                                                                   |
-|  Policy Ref           Cheque Amount                               |
-|  [ 100004           ] [ 0.00              ] ← red bold            |
-|                                                                   |
-+-------------------------------------------------------------------+
-| (view mode)  [ Edit ]                                [ Close ]    |  ← footer (#f5f7fa)
-| (edit mode)  [ Save ]  [ Cancel ]                    [ Close ]    |
-+-------------------------------------------------------------------+
-```
+The modal is structured in four vertical bands:
+
+1. **Title bar** — navy background; "Accounts Cheque Log" in Livvic white; `×` close pill button (right).
+2. **Toolbar** — white background; Ref badge (left), New button + nav controls (right).
+3. **Form body** — white background; Find bar at top followed by all form fields.
+4. **Footer** — `#f5f7fa` background; mode-dependent action buttons (right).
 
 #### 4.2.1 Toolbar
 
@@ -271,22 +231,22 @@ All fields are **read-only** in view mode (`ro = true`). Edit mode is entered vi
 
 #### 4.2.4 Modes and state transitions
 
-```
-OPEN (existing cheque)
-  └─ view mode (ro=true)
-       ├─ [Edit] → edit mode (ro=false)
-       │     ├─ [Save] → persist via updateCheque / createCheque → toast → view mode
-       │     └─ [Cancel] → reload cheque from store → view mode
-       └─ navigate ([|<][<][>][>|] / Find) → load different cheque → view mode
+**Opening an existing cheque** — modal opens in view mode (read-only).
 
-[New] → new mode (isNew=true, isEditing=true, blank form, pendingLogRef set)
-       ├─ [Save] → createCheque → wantLastRef=true → navigate to new record → view mode
-       └─ [Cancel] → return to previous cheque → view mode
+- **[ Edit ]** — switches to edit mode; all fields become editable.
+  - **[ Save ]** — calls `updateCheque`; shows toast; returns to view mode.
+  - **[ Cancel ]** — reloads current cheque from store; returns to view mode without saving.
+- **Navigation** (`[|<]` `[<]` `[>]` `[>|]`) or **Find** — loads a different cheque; stays in view mode.
 
-[Close] / [×] / Escape
-  ├─ no unsaved changes → close modal immediately
-  └─ unsaved changes → ExitConfirmationDialog (§4.3)
-```
+**[ New ]** — opens a blank form in new + editing mode; `pendingLogRef` is auto-assigned.
+
+- **[ Save ]** — calls `createCheque`; sets `wantLastRef = true`; navigates to the newly created record; switches to view mode.
+- **[ Cancel ]** — returns to the previously viewed cheque in view mode.
+
+**[ Close ] / [ × ] / Escape**
+
+- No unsaved changes — closes the modal immediately.
+- Unsaved changes present — opens ExitConfirmationDialog (§4.3).
 
 #### 4.2.5 Toast notifications
 
@@ -333,25 +293,12 @@ behaviour:
 
 Overlay modal displaying an A4-proportioned paged report of cheques for the global date range. Triggered from Dashboard → **Accounts**.
 
-```
-+---------------------------------------------------------------------+
-| Accounts Report                                          [ × ]      |  ← navy title bar
-+---------------------------------------------------------------------+
-| [|<][<]  1 of 2  [>][>|]  |  [Print]  [Export]  |  [100% [v]]  |  Total: 68  |
-+---------------------------------------------------------------------+
-|  +---------------------------------------------------------------+  |
-|  |              ACCOUNTS CHEQUE LOG                              |  |
-|  |    From: 03 December 2025      To: 12 June 2026              |  |
-|  |---------------------------------------------------------------|  |
-|  | Ref    | Date Rec'd | Drawer  | Policy Name/  | Policy | Amt  |  |
-|  |        |            |         | Cheque Details| No     |      |  |
-|  |        |            |         |               |        |      |  |
-|  | Dept   | Payin Slip | Signed  |               |        |      |  |
-|  |        | No         | Posted  |               |        |      |  |
-|  +---------------------------------------------------------------+  |
-|                                                          [ Close ]  |
-+---------------------------------------------------------------------+
-```
+The modal is structured in four vertical bands:
+
+1. **Title bar** — navy background; "Accounts Report" in Livvic white; `×` close pill button (right).
+2. **Toolbar** — white background; page navigation, Print, Export, Zoom, and Total controls in a single row (see §4.4.1).
+3. **Report canvas** — white background; A4-proportioned (794 × 1123 px) paged preview, scaled by the Zoom setting. Report title and date range header at top, followed by a 9-column data grid.
+4. **Footer** — `#f5f7fa` background; `[ Close ]` button (secondary, right-aligned).
 
 #### 4.4.1 Toolbar
 
@@ -661,40 +608,19 @@ Enriched read model (`Cheque`) extends `ChequeRecord` with `accountName: string`
 
 ## 6. Screen Flow Summary
 
-```
-Browser loads / (or any URL)
-         │
-         ▼
-    [ Layout ]
-    ┌─────────────────────────────────────────────────┐
-    │  Header (navy)  —  [ Close ] [ Logout ]         │
-    │─────────────────────────────────────────────────│
-    │                                                 │
-    │         Dashboard / Menu  (route: /)            │
-    │                                                 │
-    │  ┌───────────────┐                              │
-    │  │ Start Date    │                              │
-    │  │ [DatePicker]  │──► DatePicker Popover        │
-    │  │ End Date      │     (calendar → months → yrs)│
-    │  │ [DatePicker]  │                              │
-    │  │───────────────│                              │
-    │  │ [ Accounts ]  │──────────────────────────────┼──► AccountsReportModal
-    │  │ [ New/Amend ] │──────────────────────────────┼──► ChequeLogModal
-    │  └───────────────┘                              │
-    │                                                 │
-    │  Footer (white)                                 │
-    └─────────────────────────────────────────────────┘
+Every URL is served by the single-page app. The global `Layout` wraps all routes, providing the navy Header and white Footer on every screen.
 
-AccountsReportModal
-  ├── [ Print ]  ──► PrintDialog
-  └── [ Export ] ──► ExportDialog
-                       └── (xls/xls-data only) ──► ExcelFormatDialog
+**Entry point (`/`)** — Dashboard / Menu card is rendered. The user selects a date range using the two DatePicker popovers, which update the global `DateRangeContext`.
 
-ChequeLogModal
-  └── [ Close/×/Esc ] when dirty ──► ExitConfirmationDialog
-                                         ├── Yes ──► closes modal
-                                         └── No  ──► returns to edit
-```
+From the Dashboard the user can:
+
+- Click **Accounts** — opens `AccountsReportModal`, which renders a paged A4 report for the selected date range.
+  - From within the report: **Print** opens `PrintDialog`; **Export** opens `ExportDialog`.
+  - If the chosen export format is MS Excel 97-2000 or MS Excel 97-2000 (Data only), `ExportDialog` automatically opens `ExcelFormatDialog` before completing the export.
+- Click **New / Amend** — opens `ChequeLogModal`, which displays the cheque register. The user can browse, search, edit, or create cheques.
+  - Attempting to close the modal with unsaved changes triggers `ExitConfirmationDialog`; confirming with **Yes** closes the modal, **No** returns to editing.
+
+No other routes are reachable via the UI. The Header **Close** button navigates to `/`; **Logout** clears `localStorage` and reloads.
 
 ---
 
