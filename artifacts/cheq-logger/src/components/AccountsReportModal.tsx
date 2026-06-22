@@ -26,10 +26,18 @@ const EXPORT_FORMATS = [
   { value: "tsv",          label: "Tab-separated text" },
 ];
 
+const EXPORT_DESTINATIONS = [
+  { value: "application",      label: "Application" },
+  { value: "disk",             label: "Disk file" },
+  { value: "exchange-folder",  label: "Exchange Folder" },
+  { value: "lotus-domino",     label: "Lotus Domino" },
+];
+
 function ExportDialog({
   open, onCancel, onOk,
-}: { open: boolean; onCancel: () => void; onOk: (fmt: string) => void }) {
+}: { open: boolean; onCancel: () => void; onOk: (fmt: string, dest: string) => void }) {
   const [fmt, setFmt] = useState("pdf");
+  const [dest, setDest] = useState("disk");
 
   return (
     <Dialog open={open} onOpenChange={v => !v && onCancel()}>
@@ -68,16 +76,22 @@ function ExportDialog({
             <label className="block font-['Livvic'] font-semibold text-[#002f5c] text-[13px] mb-1">
               Destination:
             </label>
-            <div className="h-[44px] w-full font-['Mulish'] text-[13px] text-[#3d3d3d] border border-[#BBBBBB] rounded-[6px] px-3 bg-[#f5f7fa] flex items-center select-none">
-              Disk file
-            </div>
+            <select
+              value={dest}
+              onChange={e => setDest(e.target.value)}
+              className="h-[44px] w-full font-['Mulish'] text-[13px] text-[#3d3d3d] border border-[#BBBBBB] rounded-[6px] px-3 bg-white focus:outline-none focus:border-[#006cf4] cursor-pointer"
+            >
+              {EXPORT_DESTINATIONS.map(d => (
+                <option key={d.value} value={d.value}>{d.label}</option>
+              ))}
+            </select>
           </div>
         </div>
 
         {/* LV footer */}
         <div className="bg-[#f5f7fa] border-t border-[#BBBBBB] px-5 py-3 flex justify-end gap-2">
           <Button variant="secondary" size="sm" onClick={onCancel}>Cancel</Button>
-          <Button size="sm" onClick={() => onOk(fmt)}>OK</Button>
+          <Button size="sm" onClick={() => onOk(fmt, dest)}>OK</Button>
         </div>
       </DialogContent>
     </Dialog>
@@ -276,7 +290,7 @@ export default function AccountsReportModal({ open, onClose }: Props) {
     URL.revokeObjectURL(url);
   };
 
-  const handleExportOk = async (fmt: string) => {
+  const handleExportOk = async (fmt: string, _dest: string) => {
     setExportOpen(false);
     const el = printRef.current;
     const base = `accounts-report-${startDate}-${endDate}`;
