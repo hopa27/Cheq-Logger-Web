@@ -162,7 +162,7 @@ export default function ChequeLogModal({ open, onClose }: Props) {
     : "0 of 0";
 
   const LBL = "block font-['Livvic'] font-semibold text-[#002f5c] text-[13px] mb-1";
-  const INPUT = "h-9 font-['Mulish'] text-[13px] border-[#BBBBBB] rounded-[6px] focus-visible:ring-[#006cf4]/40";
+  const INPUT = "h-[44px] font-['Mulish'] text-[13px] border-[#BBBBBB] rounded-[6px] focus-visible:ring-[#006cf4]/40";
 
   return (
     <Dialog open={open} onOpenChange={v => !v && onClose()}>
@@ -233,9 +233,9 @@ export default function ChequeLogModal({ open, onClose }: Props) {
             </div>
             <div>
               <label className={LBL}>Signed / Posted</label>
-              <div className="flex items-center gap-2 h-9">
+              <div className="flex items-center gap-2 h-[44px]">
                 <Input
-                  className={INPUT + " bg-[#f5f7fa] text-[#00263e] font-semibold h-9 flex-1"}
+                  className={INPUT + " bg-[#f5f7fa] text-[#00263e] font-semibold flex-1"}
                   value={signedBy}
                   readOnly
                   placeholder="Not signed"
@@ -243,7 +243,7 @@ export default function ChequeLogModal({ open, onClose }: Props) {
                 <button
                   type="button"
                   onClick={() => setSignedBy(signedBy ? "" : "Admin")}
-                  className="lve-btn lve-btn-secondary shrink-0 !h-9 !rounded-[6px] !px-3 text-[12px] font-bold"
+                  className="lve-btn lve-btn-secondary shrink-0 !h-[44px] !rounded-[6px] !px-3 text-[12px] font-bold"
                 >
                   {signedBy ? "Unsign" : "Sign"}
                 </button>
