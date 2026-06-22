@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation } from "wouter";
-import logoUrl from "@/assets/logo.svg";
+import logoUrl from "@/assets/lve-logo.png";
 
 export default function Header({ title }: { title?: string }) {
   const [location, setLocation] = useLocation();
