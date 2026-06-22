@@ -302,11 +302,6 @@ export default function ChequeLogModal({ open, onClose }: Props) {
 
         {/* Footer */}
         <div className="bg-[#f5f7fa] border-t border-[#BBBBBB] px-5 py-3 flex justify-end gap-2">
-          <Button variant="secondary" size="sm"
-            onClick={handleSave}
-            disabled={createCheque.isPending || updateCheque.isPending}>
-            Save
-          </Button>
           <Button variant="secondary" size="sm" onClick={onClose}>
             Close
           </Button>
