@@ -85,7 +85,10 @@ export default function ChequeLogModal({ open, onClose }: Props) {
   const [signedBy, setSignedBy] = useState<string>("");
   const [pendingLogRef, setPendingLogRef] = useState("");
   const [suggestOpen, setSuggestOpen] = useState(false);
+  const [confirmClose, setConfirmClose] = useState(false);
   const wantLastRef = React.useRef(false);
+
+  const requestClose = () => setConfirmClose(true);
 
   const suggestions = form.findQuery.trim().length > 0
     ? cheques.filter(c => {
@@ -221,7 +224,7 @@ export default function ChequeLogModal({ open, onClose }: Props) {
   const INPUT_RO = INPUT + " bg-[#f5f7fa] cursor-default select-text";
 
   return (
-    <Dialog open={open} onOpenChange={v => !v && onClose()}>
+    <Dialog open={open} onOpenChange={v => { if (!v) requestClose(); }}>
       <DialogContent className="p-0 gap-0 max-w-[540px] rounded-[8px] overflow-hidden border border-[#BBBBBB] shadow-2xl [&>button]:hidden" onInteractOutside={e => e.preventDefault()}>
 
         {/* Visually hidden title for screen reader accessibility */}
@@ -232,7 +235,7 @@ export default function ChequeLogModal({ open, onClose }: Props) {
           <span className="font-['Livvic'] text-white text-[16px] font-semibold">
             Accounts Cheque Log
           </span>
-          <button type="button" onClick={onClose} title="Close"
+          <button type="button" onClick={requestClose} title="Close"
             className="lve-btn lve-btn-secondary !rounded-full !p-0 !w-7 !h-7 shrink-0">
             <MdClose size={16} />
           </button>
@@ -428,10 +431,34 @@ export default function ChequeLogModal({ open, onClose }: Props) {
               <Button variant="secondary" size="sm" onClick={handleCancel}>Cancel</Button>
             </>
           )}
-          <Button variant="secondary" size="sm" onClick={onClose}>Close</Button>
+          <Button variant="secondary" size="sm" onClick={requestClose}>Close</Button>
         </div>
 
       </DialogContent>
+
+      {/* Exit confirmation */}
+      <Dialog open={confirmClose} onOpenChange={v => !v && setConfirmClose(false)}>
+        <DialogContent
+          className="p-0 gap-0 max-w-[280px] rounded-[8px] overflow-hidden border border-[#BBBBBB] shadow-2xl [&>button]:hidden"
+          onInteractOutside={e => e.preventDefault()}
+        >
+          <DialogTitle className="sr-only">Confirm exit</DialogTitle>
+          <div className="bg-[#00263e] px-4 py-2 flex items-center gap-2">
+            <span className="font-['Livvic'] text-white text-[14px] font-semibold">Information</span>
+          </div>
+          <div className="bg-white px-5 py-5 flex items-start gap-3">
+            <span className="text-[#006cf4] text-[22px] leading-none select-none">i</span>
+            <p className="font-['Mulish'] text-[13px] text-[#3d3d3d] pt-[2px]">Exit now?</p>
+          </div>
+          <div className="bg-[#f5f7fa] border-t border-[#BBBBBB] px-4 py-2 flex justify-end gap-2">
+            <Button size="sm" className="lve-btn min-w-[56px]"
+              onClick={() => { setConfirmClose(false); onClose(); }}>Yes</Button>
+            <Button variant="secondary" size="sm" className="min-w-[56px]"
+              onClick={() => setConfirmClose(false)}>No</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
     </Dialog>
   );
 }
