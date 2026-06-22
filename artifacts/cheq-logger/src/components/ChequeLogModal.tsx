@@ -244,7 +244,7 @@ export default function ChequeLogModal({ open, onClose }: Props) {
                 />
                 <button
                   type="button"
-                  onClick={() => setSignedBy(signedBy ? "" : "Admin")}
+                  onClick={() => setSignedBy(signedBy ? "" : "UAT3")}
                   title={signedBy ? "Unsign" : "Sign"}
                   className="lve-btn lve-btn-secondary shrink-0 !h-[44px] !w-[44px] !rounded-[6px] !p-0 flex items-center justify-center"
                 >
