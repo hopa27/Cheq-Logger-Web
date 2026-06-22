@@ -31,6 +31,7 @@ import {
   MdNavigateBefore,
   MdNavigateNext,
   MdNoteAdd,
+  MdClose,
 } from "react-icons/md";
 
 interface FormState {
@@ -161,11 +162,15 @@ export default function ChequeLogModal({ open, onClose }: Props) {
     <Dialog open={open} onOpenChange={v => !v && onClose()}>
       <DialogContent className="p-0 gap-0 max-w-[540px] rounded-[8px] overflow-hidden border border-[#BBBBBB] shadow-2xl [&>button]:hidden">
 
-        {/* Header — title only */}
-        <div className="bg-[#00263e] px-5 py-3">
+        {/* Header — title + close */}
+        <div className="bg-[#00263e] px-5 py-3 flex items-center justify-between">
           <span className="font-['Livvic'] text-white text-[16px] font-semibold">
             Accounts Cheque Log
           </span>
+          <button type="button" onClick={onClose} title="Close"
+            className="lve-btn lve-btn-secondary !rounded-full !p-0 !w-7 !h-7 shrink-0">
+            <MdClose size={16} />
+          </button>
         </div>
 
         {/* Toolbar strip */}
