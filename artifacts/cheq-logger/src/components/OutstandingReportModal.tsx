@@ -109,7 +109,8 @@ const DUMMY_ROWS: DummyRow[] = [
 const PAGE_1_ROWS = DUMMY_ROWS.slice(0, 34);
 const PAGE_2_ROWS = DUMMY_ROWS.slice(34);
 
-const COL_WIDTHS = "grid-cols-[90px_90px_130px_160px_80px_80px_90px_70px_80px]";
+// Columns must sum to ≤ 698px (A4 794px − 48px×2 side padding)
+const COL_WIDTHS = "grid-cols-[72px_72px_104px_128px_60px_64px_72px_52px_74px]";
 
 function TableHead() {
   const thCls = "text-left font-['Mulish'] font-bold text-[9.5px] text-[#3d3d3d] border-b border-[#3d3d3d] pb-[3px] whitespace-nowrap pr-2";
@@ -180,7 +181,7 @@ export default function OutstandingReportModal({ open, onClose }: Props) {
         h2 { text-align: center; font-size: 12px; margin-bottom: 12px; }
         .subtitle { text-align: center; font-size: 9px; margin-bottom: 16px; }
         .section { font-weight: bold; padding: 6px 0 2px; font-size: 9px; }
-        .grid { display: grid; grid-template-columns: 90px 85px 120px 155px 75px 75px 90px 65px 75px; }
+        .grid { display: grid; grid-template-columns: 72px 72px 104px 128px 60px 64px 72px 52px 74px; }
         .th { font-weight: bold; border-bottom: 1px solid #000; padding-bottom: 2px; font-size: 8.5px; padding-right: 6px; }
         .td { font-size: 8.5px; padding: 1px 6px 1px 0; }
         .amt { text-align: right; }
