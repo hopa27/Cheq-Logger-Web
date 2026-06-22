@@ -5,6 +5,7 @@ import { DatePicker } from "@/components/ui/date-picker";
 import { Button } from "@/components/ui/button";
 import ChequeLogModal from "@/components/ChequeLogModal";
 import AccountsReportModal from "@/components/AccountsReportModal";
+import OutstandingReportModal from "@/components/OutstandingReportModal";
 import { MdPrint, MdNoteAdd } from "react-icons/md";
 import { listCheques, listDepartments } from "@/lib/store";
 import { format } from "date-fns";
@@ -77,6 +78,7 @@ export default function Dashboard() {
   const { startDate, endDate, setStartDate, setEndDate } = useDateRange();
   const [modalOpen, setModalOpen] = useState(false);
   const [accountsOpen, setAccountsOpen] = useState(false);
+  const [outstandingOpen, setOutstandingOpen] = useState(false);
 
   return (
     <div className="flex justify-center items-start pt-8">
@@ -107,7 +109,7 @@ export default function Dashboard() {
             <Button variant="secondary" size="lg" className="w-full justify-start gap-3" onClick={() => saveDeptReport(startDate, endDate)}>
               <MdPrint size={20} />Dept
             </Button>
-            <Button variant="secondary" size="lg" className="w-full justify-start gap-3" onClick={() => setLocation("/reports/outstanding")}>
+            <Button variant="secondary" size="lg" className="w-full justify-start gap-3" onClick={() => setOutstandingOpen(true)}>
               <MdPrint size={20} />O/S Cheques
             </Button>
             <Button variant="secondary" size="lg" className="w-full justify-start gap-3" onClick={() => setModalOpen(true)}>
@@ -119,6 +121,7 @@ export default function Dashboard() {
 
       <ChequeLogModal open={modalOpen} onClose={() => setModalOpen(false)} />
       <AccountsReportModal open={accountsOpen} onClose={() => setAccountsOpen(false)} />
+      <OutstandingReportModal open={outstandingOpen} onClose={() => setOutstandingOpen(false)} />
     </div>
   );
 }
