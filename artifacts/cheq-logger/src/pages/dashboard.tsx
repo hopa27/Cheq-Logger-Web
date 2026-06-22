@@ -4,12 +4,14 @@ import { useDateRange } from "@/lib/date-context";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Button } from "@/components/ui/button";
 import ChequeLogModal from "@/components/ChequeLogModal";
+import AccountsReportModal from "@/components/AccountsReportModal";
 import { MdPrint, MdNoteAdd } from "react-icons/md";
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
   const { startDate, endDate, setStartDate, setEndDate } = useDateRange();
   const [modalOpen, setModalOpen] = useState(false);
+  const [accountsOpen, setAccountsOpen] = useState(false);
 
   return (
     <div className="flex justify-center items-start pt-8">
@@ -34,7 +36,7 @@ export default function Dashboard() {
           <div className="h-px bg-[#e0e0e0]" />
 
           <div className="space-y-3">
-            <Button variant="secondary" size="lg" className="w-full justify-start gap-3" onClick={() => setLocation("/reports/accounts")}>
+            <Button variant="secondary" size="lg" className="w-full justify-start gap-3" onClick={() => setAccountsOpen(true)}>
               <MdPrint size={20} />Accounts
             </Button>
             <Button variant="secondary" size="lg" className="w-full justify-start gap-3" onClick={() => setLocation("/reports/departments")}>
@@ -51,6 +53,7 @@ export default function Dashboard() {
       </div>
 
       <ChequeLogModal open={modalOpen} onClose={() => setModalOpen(false)} />
+      <AccountsReportModal open={accountsOpen} onClose={() => setAccountsOpen(false)} />
     </div>
   );
 }
