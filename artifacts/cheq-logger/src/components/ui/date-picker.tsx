@@ -58,12 +58,11 @@ export function DatePicker({
     }
   };
 
-  const handleInputClick = () => {
-    if (disabled) return;
-    if (onPresetSelect) {
-      setPresetOpen(v => !v);
-      setCalOpen(false);
-    }
+  const handleInputContextMenu = (e: React.MouseEvent) => {
+    if (disabled || !onPresetSelect) return;
+    e.preventDefault();
+    setPresetOpen(v => !v);
+    setCalOpen(false);
   };
 
   const handlePresetClick = (preset: Preset) => {
@@ -92,7 +91,7 @@ export function DatePicker({
           <Input
             value={typedValue}
             onChange={handleTyping}
-            onClick={handleInputClick}
+            onContextMenu={handleInputContextMenu}
             placeholder={placeholder ?? "DD/MM/YYYY"}
             disabled={disabled}
             isError={isError}
