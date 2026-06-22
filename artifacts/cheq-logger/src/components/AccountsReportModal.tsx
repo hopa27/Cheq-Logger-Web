@@ -8,6 +8,77 @@ import {
   MdNavigateBefore, MdNavigateNext,
 } from "react-icons/md";
 
+const EXPORT_FORMATS = [
+  { value: "pdf",  label: "Acrobat Format (PDF)" },
+  { value: "html", label: "HTML Document" },
+  { value: "csv",  label: "CSV File" },
+];
+
+function ExportDialog({
+  open, onCancel, onOk,
+}: { open: boolean; onCancel: () => void; onOk: (fmt: string) => void }) {
+  const [fmt, setFmt] = useState("pdf");
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center">
+      {/* backdrop — does not close (legacy behaviour) */}
+      <div className="absolute inset-0 bg-black/40" />
+      <div className="relative bg-[#f0f0f0] border-2 border-[#8a8a8a] shadow-2xl w-[340px]" style={{ fontFamily: "Mulish, Arial, sans-serif" }}>
+        {/* Title bar */}
+        <div className="bg-[#00263e] px-3 py-[5px] flex items-center justify-between">
+          <span className="text-white text-[13px] font-semibold select-none">Export</span>
+          <button
+            type="button"
+            onClick={onCancel}
+            className="text-white text-[14px] w-5 h-5 flex items-center justify-center hover:bg-white/20 rounded-sm focus:outline-none"
+            aria-label="Close"
+          >
+            <MdClose size={14} />
+          </button>
+        </div>
+        {/* Body */}
+        <div className="px-4 pt-4 pb-3 space-y-3">
+          <div>
+            <label className="block text-[12px] text-[#3d3d3d] mb-1 font-semibold">Format:</label>
+            <select
+              value={fmt}
+              onChange={e => setFmt(e.target.value)}
+              className="w-full border border-[#8a8a8a] bg-white text-[12px] text-[#3d3d3d] px-2 h-[26px] focus:outline-none focus:border-[#006cf4] cursor-pointer"
+            >
+              {EXPORT_FORMATS.map(f => (
+                <option key={f.value} value={f.value}>{f.label}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-[12px] text-[#3d3d3d] mb-1 font-semibold">Destination:</label>
+            <div className="w-full border border-[#8a8a8a] bg-white text-[12px] text-[#3d3d3d] px-2 h-[26px] flex items-center select-none">
+              Disk file
+            </div>
+          </div>
+        </div>
+        {/* Buttons */}
+        <div className="flex gap-2 justify-end px-4 pb-4">
+          <button
+            type="button"
+            onClick={() => onOk(fmt)}
+            className="bg-[#00263e] text-white text-[12px] font-semibold px-6 h-[26px] border border-[#00263e] hover:bg-[#004080] focus:outline-none"
+          >
+            OK
+          </button>
+          <button
+            type="button"
+            onClick={onCancel}
+            className="bg-[#f0f0f0] text-[#3d3d3d] text-[12px] font-semibold px-4 h-[26px] border border-[#8a8a8a] hover:bg-[#e0e0e0] focus:outline-none"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 interface Props {
   open: boolean;
   onClose: () => void;
@@ -156,6 +227,7 @@ export default function AccountsReportModal({ open, onClose }: Props) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [zoom, setZoom] = useState(100);
   const [currentPage, setCurrentPage] = useState(1);
+  const [exportOpen, setExportOpen] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -192,26 +264,52 @@ export default function AccountsReportModal({ open, onClose }: Props) {
     w.document.close(); w.focus(); w.print();
   };
 
-  const handleExport = async () => {
-    const el = printRef.current;
-    if (!el) return;
-    const html = `<html><head><title>Accounts Report</title></head><body>${el.innerHTML}</body></html>`;
-    const blob = new Blob([html], { type: "text/html" });
-    const filename = `accounts-report-${startDate}-${endDate}.html`;
-    if ("showSaveFilePicker" in window) {
-      try {
-        const handle = await (window as any).showSaveFilePicker({
-          suggestedName: filename,
-          types: [{ description: "HTML file", accept: { "text/html": [".html"] } }],
-        });
-        const writable = await handle.createWritable();
-        await writable.write(blob); await writable.close(); return;
-      } catch { /* cancelled */ }
-    }
+  const download = (blob: Blob, filename: string) => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url; a.download = filename; a.click();
     URL.revokeObjectURL(url);
+  };
+
+  const handleExportOk = async (fmt: string) => {
+    setExportOpen(false);
+    const el = printRef.current;
+
+    if (fmt === "pdf") {
+      // Open print dialog — user selects "Save as PDF" in their print dialog
+      if (!el) return;
+      const w = window.open("", "_blank", "width=960,height=650");
+      if (!w) return;
+      w.document.write(`<html><head><title>Accounts Report</title>
+        <style>
+          @page { size: A4 portrait; margin: 20mm 15mm; }
+          body { font-family: Arial, sans-serif; font-size: 9px; color: #000; }
+          h2 { text-align: center; font-size: 12px; margin-bottom: 12px; }
+          .grid { display: grid; grid-template-columns: 72px 72px 104px 128px 60px 64px 72px 52px 74px; }
+          .th { font-weight: bold; border-bottom: 1px solid #000; padding-bottom: 2px; font-size: 8.5px; padding-right: 6px; }
+          .td { font-size: 8.5px; padding: 1px 6px 1px 0; }
+        </style></head><body>${el.innerHTML}</body></html>`);
+      w.document.close(); w.focus(); w.print();
+      return;
+    }
+
+    if (fmt === "html") {
+      if (!el) return;
+      const html = `<html><head><title>Accounts Report</title></head><body>${el.innerHTML}</body></html>`;
+      const blob = new Blob([html], { type: "text/html" });
+      download(blob, `accounts-report-${startDate}-${endDate}.html`);
+      return;
+    }
+
+    if (fmt === "csv") {
+      const headers = ["Ref", "Date Rec'd", "Drawer", "Policy Name/Cheque Details", "Policy No", "Amount", "Department", "Payin Slip No", "Signed Posted"];
+      const rows = DUMMY_ROWS.map(r =>
+        [r.ref, r.date, `"${r.drawer}"`, `"${r.policyName}"`, r.policyNo, r.amount, r.department, r.payinSlip, r.signedPosted].join(",")
+      );
+      const csv = [headers.join(","), ...rows].join("\r\n");
+      const blob = new Blob([csv], { type: "text/csv" });
+      download(blob, `accounts-report-${startDate}-${endDate}.csv`);
+    }
   };
 
   const TB_BTN = "lve-btn lve-btn-secondary !rounded-full !p-0 !w-8 !h-8 shrink-0 disabled:opacity-40 disabled:pointer-events-none disabled:shadow-none";
@@ -249,7 +347,7 @@ export default function AccountsReportModal({ open, onClose }: Props) {
           <button className={TB_BTN} disabled={isLast}  title="Last"     onClick={() => setCurrentPage(TOTAL_PAGES)}><MdSkipNext size={14} /></button>
           <div className="w-px h-5 bg-[#BBBBBB] mx-1" />
           <button className={TB_BTN} title="Print" onClick={handlePrint}><MdPrint size={14} /></button>
-          <button className={TB_BTN} title="Export / Save As" onClick={handleExport}><MdSave size={14} /></button>
+          <button className={TB_BTN} title="Export / Save As" onClick={() => setExportOpen(true)}><MdSave size={14} /></button>
           <div className="w-px h-5 bg-[#BBBBBB] mx-1" />
           <select
             value={zoom}
@@ -316,6 +414,12 @@ export default function AccountsReportModal({ open, onClose }: Props) {
           </div>
         </div>
       </DialogContent>
+
+      <ExportDialog
+        open={exportOpen}
+        onCancel={() => setExportOpen(false)}
+        onOk={handleExportOk}
+      />
     </Dialog>
   );
 }
