@@ -33,14 +33,24 @@ export default function Header({ title }: { title?: string }) {
             </>
           )}
         </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-8 text-sm font-medium border-none text-white hover:bg-white/10 hover:text-white"
-          onClick={() => { localStorage.clear(); window.location.reload(); }}
-        >
-          Logout
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 text-sm font-medium border-none text-white hover:bg-white/10 hover:text-white"
+            onClick={() => setLocation("/")}
+          >
+            Close
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 text-sm font-medium border-none text-white hover:bg-white/10 hover:text-white"
+            onClick={() => { localStorage.clear(); window.location.reload(); }}
+          >
+            Logout
+          </Button>
+        </div>
       </div>
     </header>
   );
