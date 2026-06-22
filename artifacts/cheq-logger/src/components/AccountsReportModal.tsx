@@ -89,7 +89,7 @@ export default function AccountsReportModal({ open, onClose }: Props) {
     URL.revokeObjectURL(url);
   };
 
-  const TB_BTN = "flex items-center justify-center w-7 h-7 rounded border border-[#BBBBBB] bg-white text-[#3d3d3d] hover:bg-[#e8f0fe] hover:border-[#006cf4] transition-colors disabled:opacity-40 disabled:pointer-events-none";
+  const TB_BTN = "lve-btn lve-btn-secondary !rounded-full !p-0 !w-8 !h-8 shrink-0 disabled:opacity-40 disabled:pointer-events-none disabled:shadow-none";
 
   const thClass = "text-left font-['Mulish'] font-bold text-[10px] text-[#3d3d3d] border-b border-[#3d3d3d] pb-1 whitespace-nowrap px-1";
   const tdClass = "font-['Mulish'] text-[11px] text-[#3d3d3d] py-[3px] px-1 whitespace-nowrap";
@@ -113,8 +113,8 @@ export default function AccountsReportModal({ open, onClose }: Props) {
           </button>
         </div>
 
-        {/* Crystal-Reports-style viewer toolbar */}
-        <div className="bg-[#e4e4e4] border-b border-[#BBBBBB] px-3 py-1.5 flex items-center gap-1.5 flex-wrap">
+        {/* Viewer toolbar */}
+        <div className="bg-[#f5f7fa] border-b border-[#BBBBBB] px-4 py-2 flex items-center gap-2 flex-wrap">
           {/* Navigation */}
           <button className={TB_BTN} title="First page" disabled><MdSkipPrevious size={14} /></button>
           <button className={TB_BTN} title="Previous page" disabled><MdNavigateBefore size={14} /></button>
@@ -136,7 +136,7 @@ export default function AccountsReportModal({ open, onClose }: Props) {
           <select
             value={zoom}
             onChange={e => setZoom(Number(e.target.value))}
-            className="font-['Mulish'] text-[11px] border border-[#BBBBBB] rounded bg-white text-[#3d3d3d] h-7 px-1 focus:outline-none focus:border-[#006cf4]"
+            className="font-['Mulish'] text-[12px] font-bold text-[#00263e] border border-[#04589b] rounded-[6px] bg-white h-8 px-2 focus:outline-none focus:border-[#006cf4] cursor-pointer"
           >
             {ZOOM_OPTIONS.map(z => (
               <option key={z} value={z}>{z}%</option>
@@ -146,13 +146,13 @@ export default function AccountsReportModal({ open, onClose }: Props) {
           <div className="w-px h-5 bg-[#BBBBBB] mx-1" />
 
           {/* Stats */}
-          <span className="font-['Mulish'] text-[11px] text-[#3d3d3d] select-none">
+          <span className="font-['Mulish'] text-[12px] font-semibold text-[#4a4a49] select-none">
             Total: {cheques.length}
           </span>
-          <span className="font-['Mulish'] text-[11px] text-[#3d3d3d] select-none mx-2">
+          <span className="font-['Mulish'] text-[12px] font-semibold text-[#4a4a49] select-none mx-1">
             {formatCurrency(totalAmount)}
           </span>
-          <span className="font-['Mulish'] text-[11px] text-[#3d3d3d] select-none">
+          <span className="font-['Mulish'] text-[12px] text-[#4a4a49] select-none">
             {cheques.length} of {cheques.length}
           </span>
         </div>
