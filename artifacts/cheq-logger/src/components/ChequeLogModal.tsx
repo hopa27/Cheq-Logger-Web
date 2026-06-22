@@ -79,6 +79,7 @@ export default function ChequeLogModal({ open, onClose }: Props) {
   const [isNew, setIsNew] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [form, setForm] = useState<FormState>(emptyForm());
+  const [signedBy, setSignedBy] = useState<string>("");
 
   const currentCheque = !isNew && cheques.length > 0 ? cheques[currentIndex] : null;
 
@@ -232,7 +233,21 @@ export default function ChequeLogModal({ open, onClose }: Props) {
             </div>
             <div>
               <label className={LBL}>Signed / Posted</label>
-              <Input className={INPUT + " bg-[#f5f7fa] text-[#00263e] font-semibold"} value="Admin" readOnly />
+              <div className="flex items-center gap-2 h-9">
+                <Input
+                  className={INPUT + " bg-[#f5f7fa] text-[#00263e] font-semibold h-9 flex-1"}
+                  value={signedBy}
+                  readOnly
+                  placeholder="Not signed"
+                />
+                <button
+                  type="button"
+                  onClick={() => setSignedBy(signedBy ? "" : "Admin")}
+                  className="lve-btn lve-btn-secondary shrink-0 !h-9 !rounded-[6px] !px-3 text-[12px] font-bold"
+                >
+                  {signedBy ? "Unsign" : "Sign"}
+                </button>
+              </div>
             </div>
           </div>
 
