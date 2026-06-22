@@ -66,6 +66,10 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+html {
+  zoom: 0.8;
+}
+
 /* LIGHT MODE */
 :root {
   --button-outline: rgba(0,0,0, .10);
