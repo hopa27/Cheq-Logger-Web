@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLocation } from "wouter";
 import logoUrl from "@/assets/lve-logo.png";
+import { Button } from "@/components/ui/button";
 
 export default function Header({ title }: { title?: string }) {
   const [location, setLocation] = useLocation();
@@ -32,12 +33,14 @@ export default function Header({ title }: { title?: string }) {
             </>
           )}
         </div>
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 text-sm font-medium border-none text-white hover:bg-white/10 hover:text-white"
           onClick={() => { localStorage.clear(); window.location.reload(); }}
-          className="text-white/70 hover:text-white text-sm font-['Mulish'] transition-colors flex-shrink-0 border border-white/30 hover:border-white/60 rounded-[30px] px-4 py-1.5"
         >
           Logout
-        </button>
+        </Button>
       </div>
     </header>
   );
