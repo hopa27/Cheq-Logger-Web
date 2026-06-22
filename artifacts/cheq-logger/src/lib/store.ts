@@ -69,7 +69,7 @@ interface DB {
   seq: number;
 }
 
-const STORAGE_KEY = "cheq_logger_db_v4";
+const STORAGE_KEY = "cheq_logger_db_v5";
 
 function seed(): DB {
   const now = new Date();
