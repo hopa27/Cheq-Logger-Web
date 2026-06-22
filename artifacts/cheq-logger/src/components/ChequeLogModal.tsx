@@ -183,6 +183,11 @@ export default function ChequeLogModal({ open, onClose }: Props) {
 
         {/* Toolbar strip */}
         <div className="bg-[#f5f7fa] border-b border-[#BBBBBB] px-4 py-2 flex items-center gap-2">
+          {/* Cheque number badge — no label, left-anchored */}
+          <span className="font-['Mulish'] text-[13px] font-bold text-[#00263e] bg-white border border-[#BBBBBB] rounded-[6px] px-3 h-8 flex items-center min-w-[80px] select-none">
+            {form.chequeNumber || <span className="text-[#999]">—</span>}
+          </span>
+          <div className="flex-1" />
           <button type="button" onClick={handleNew} title="New"
             className="lve-btn lve-btn-secondary !rounded-full !p-0 !w-8 !h-8 shrink-0">
             <MdNoteAdd size={18} />
