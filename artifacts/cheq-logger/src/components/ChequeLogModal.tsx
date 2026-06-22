@@ -229,7 +229,7 @@ export default function ChequeLogModal({ open, onClose }: Props) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className={LBL}>Date Rec'd</label>
-              <DatePicker value={form.issueDate} onChange={val => set("issueDate")(val)} />
+              <DatePicker value={form.issueDate} onChange={val => set("issueDate")(val)} inputClassName={INPUT} />
             </div>
             <div>
               <label className={LBL}>Signed / Posted</label>

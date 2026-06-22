@@ -13,9 +13,10 @@ export interface DatePickerProps {
   isError?: boolean;
   placeholder?: string;
   className?: string;
+  inputClassName?: string;
 }
 
-export function DatePicker({ value, onChange, disabled, isError, placeholder, className }: DatePickerProps) {
+export function DatePicker({ value, onChange, disabled, isError, placeholder, className, inputClassName }: DatePickerProps) {
   const [open, setOpen] = React.useState(false);
   const dateValue = value ? new Date(value) : undefined;
   
@@ -31,7 +32,7 @@ export function DatePicker({ value, onChange, disabled, isError, placeholder, cl
             placeholder={placeholder}
             disabled={disabled}
             isError={isError}
-            className={cn("cursor-pointer", open && !isError && "border-[#178830] border-[2px]")}
+            className={cn("cursor-pointer", open && !isError && "border-[#178830] border-[2px]", inputClassName)}
             suffixIcon={<MdOutlineCalendarToday />}
           />
         </div>
