@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "nx1G82oZ3uACsKHdQ8M_f"
+uri = "file://CHEQ_Logger_SCREEN_FLOW(Angular).md"
+type = "text"
+title = "CHEQ Logger — Screen Flow (Angular)"
