@@ -144,6 +144,7 @@ export default function ChequeLogModal({ open, onClose }: Props) {
     const next = String(Math.max(31000000, ...cheques.map(c => parseInt(c.logRef, 10) || 0)) + 1);
     setPendingLogRef(next);
     setForm(emptyForm());
+    setSignedBy("");
     setIsNew(true);
     setIsEditing(true);
   };
