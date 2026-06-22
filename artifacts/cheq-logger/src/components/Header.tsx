@@ -24,9 +24,12 @@ export default function Header({ title }: { title?: string }) {
             <img src={logoUrl} alt="CHEQ Logger" className="h-6" />
           </button>
           {displayTitle && (
-            <h1 className="font-['Livvic'] text-2xl font-normal tracking-tight text-white">
-              {displayTitle}
-            </h1>
+            <>
+              <div className="w-px h-6 bg-white/30 flex-shrink-0" />
+              <h1 className="font-['Livvic'] text-2xl font-normal tracking-tight text-white">
+                {displayTitle}
+              </h1>
+            </>
           )}
         </div>
         {location !== '/' && (
