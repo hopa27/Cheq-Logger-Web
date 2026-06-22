@@ -165,7 +165,7 @@ export default function ChequeLogModal({ open, onClose }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={v => !v && onClose()}>
-      <DialogContent className="p-0 gap-0 max-w-[540px] rounded-[8px] overflow-hidden border border-[#BBBBBB] shadow-2xl [&>button]:hidden">
+      <DialogContent className="p-0 gap-0 max-w-[540px] rounded-[8px] overflow-hidden border border-[#BBBBBB] shadow-2xl [&>button]:hidden" onInteractOutside={e => e.preventDefault()}>
 
         {/* Visually hidden title for screen reader accessibility */}
         <DialogTitle className="sr-only">Accounts Cheque Log</DialogTitle>
