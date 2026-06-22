@@ -161,44 +161,42 @@ export default function ChequeLogModal({ open, onClose }: Props) {
     <Dialog open={open} onOpenChange={v => !v && onClose()}>
       <DialogContent className="p-0 gap-0 max-w-[540px] rounded-[8px] overflow-hidden border border-[#BBBBBB] shadow-2xl [&>button]:hidden">
 
-        {/* Header — navy band with title + toolbar */}
-        <div className="bg-[#00263e] px-5 py-3 flex items-center justify-between gap-4">
-          <span className="font-['Livvic'] text-white text-[16px] font-semibold flex-shrink-0">
+        {/* Header — title only */}
+        <div className="bg-[#00263e] px-5 py-3">
+          <span className="font-['Livvic'] text-white text-[16px] font-semibold">
             Accounts Cheque Log
           </span>
+        </div>
 
-          {/* position badge */}
-          <span className="font-['Mulish'] text-white/70 text-[12px] flex-shrink-0">{position}</span>
-
-          {/* toolbar buttons */}
-          <div className="flex items-center gap-1 ml-auto">
-            <Button variant="ghost" size="icon"
-              className="h-8 w-8 text-white hover:bg-white/10 hover:text-white"
-              onClick={handleNew} title="New">
-              <MdNoteAdd size={18} />
-            </Button>
-            <div className="w-px h-5 bg-white/20 mx-1" />
-            <Button variant="ghost" size="icon"
-              className="h-8 w-8 text-white hover:bg-white/10 hover:text-white"
-              onClick={handleFirst} disabled={!cheques.length} title="First">
-              <MdSkipPrevious size={18} />
-            </Button>
-            <Button variant="ghost" size="icon"
-              className="h-8 w-8 text-white hover:bg-white/10 hover:text-white"
-              onClick={handlePrev} disabled={!cheques.length || currentIndex === 0} title="Previous">
-              <MdNavigateBefore size={18} />
-            </Button>
-            <Button variant="ghost" size="icon"
-              className="h-8 w-8 text-white hover:bg-white/10 hover:text-white"
-              onClick={handleNext} disabled={!cheques.length || currentIndex >= cheques.length - 1} title="Next">
-              <MdNavigateNext size={18} />
-            </Button>
-            <Button variant="ghost" size="icon"
-              className="h-8 w-8 text-white hover:bg-white/10 hover:text-white"
-              onClick={handleLast} disabled={!cheques.length} title="Last">
-              <MdSkipNext size={18} />
-            </Button>
-          </div>
+        {/* Toolbar strip */}
+        <div className="bg-[#f5f7fa] border-b border-[#BBBBBB] px-4 py-1.5 flex items-center gap-1">
+          <Button variant="ghost" size="icon"
+            className="h-8 w-8 text-[#00263e] hover:bg-[#00263e]/10"
+            onClick={handleNew} title="New">
+            <MdNoteAdd size={18} />
+          </Button>
+          <div className="w-px h-5 bg-[#BBBBBB] mx-1" />
+          <Button variant="ghost" size="icon"
+            className="h-8 w-8 text-[#00263e] hover:bg-[#00263e]/10"
+            onClick={handleFirst} disabled={!cheques.length} title="First">
+            <MdSkipPrevious size={18} />
+          </Button>
+          <Button variant="ghost" size="icon"
+            className="h-8 w-8 text-[#00263e] hover:bg-[#00263e]/10"
+            onClick={handlePrev} disabled={!cheques.length || currentIndex === 0} title="Previous">
+            <MdNavigateBefore size={18} />
+          </Button>
+          <Button variant="ghost" size="icon"
+            className="h-8 w-8 text-[#00263e] hover:bg-[#00263e]/10"
+            onClick={handleNext} disabled={!cheques.length || currentIndex >= cheques.length - 1} title="Next">
+            <MdNavigateNext size={18} />
+          </Button>
+          <Button variant="ghost" size="icon"
+            className="h-8 w-8 text-[#00263e] hover:bg-[#00263e]/10"
+            onClick={handleLast} disabled={!cheques.length} title="Last">
+            <MdSkipNext size={18} />
+          </Button>
+          <span className="ml-auto font-['Mulish'] text-[#00263e]/50 text-[12px]">{position}</span>
         </div>
 
         {/* Form body */}
