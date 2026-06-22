@@ -49,36 +49,11 @@ between them.
   - `/cheques` or `/cheques/*` → **Cheque Register**
   - `/admin` → **Admin / Setup**
 - **[ Close ]** — navigates back to `/` (Menu).
-- **[ Logout ]** — clears all `localStorage` data and reloads the page, returning to the
-  sign-in gate (auth flag erased, seed data wiped).
+- **[ Logout ]** — clears all `localStorage` data and reloads the page (seed data wiped).
 
 ---
 
-## 2. Sign-in Gate
-
-Shown when the `localStorage` auth flag (`cheq_logger_auth_v1`) is absent.  
-No username or password is required — this is a one-click demo gate.
-
-```
-+----------------------------------------+
-|  [LV=]  CHEQ Logger                    |
-+----------------------------------------+
-|                                        |
-|   Welcome to CHEQ Logger               |
-|                                        |
-|   [ Sign in ]                          |
-|                                        |
-+----------------------------------------+
-```
-
-**Behaviour:**
-- Clicking **[ Sign in ]** sets `cheq_logger_auth_v1 = "1"` in `localStorage`.
-- On next page load the shell and full app are rendered.
-- Demo user is always `admin`; `canEdit` and `canManage` are both `true`.
-
----
-
-## 3. Menu (Dashboard) — route `/`
+## 2. Menu (Dashboard) — route `/`
 
 The primary landing screen. Provides a date range selector and the two main
 entry points: Accounts report and New/Amend cheque log.
@@ -100,19 +75,19 @@ entry points: Accounts report and New/Amend cheque log.
 - Both dates persist across the whole app via a shared `DateRangeContext`.
 - Changing either date immediately re-filters all report modals and the
   Cheque Register (they read from context).
-- Clicking the calendar icon opens the **Date Picker Popover** (see §9).
+- Clicking the calendar icon opens the **Date Picker Popover** (see §8).
 
 **Navigation from Menu:**
 ```
-[ Accounts    ]  >>>  §5 AccountsReportModal (overlaid)
-[ New / Amend ]  >>>  §4 ChequeLogModal (overlaid)
+[ Accounts    ]  >>>  §4 AccountsReportModal (overlaid)
+[ New / Amend ]  >>>  §3 ChequeLogModal (overlaid)
 Header nav bar  >>>  /cheques  (Cheque Register)
 Header nav bar  >>>  /admin    (Admin / Setup)
 ```
 
 ---
 
-## 4. ChequeLogModal — "Accounts Cheque Log"
+## 3. ChequeLogModal — "Accounts Cheque Log"
 
 Opened from the **Menu** → **[ New / Amend ]** button.
 Full-screen-overlay modal, max-width 540 px, cannot be closed by clicking outside.
@@ -146,7 +121,7 @@ Full-screen-overlay modal, max-width 540 px, cannot be closed by clicking outsid
 +------------------------------------------------------------------------+
 ```
 
-### 4A. Toolbar — navigation and record indicator
+### 3A. Toolbar — navigation and record indicator
 
 | Control | Behaviour |
 |---------|-----------|
@@ -159,14 +134,14 @@ Full-screen-overlay modal, max-width 540 px, cannot be closed by clicking outsid
 
 Cheques are sorted **numerically ascending by logRef**.
 
-### 4B. Find / Search bar
+### 3B. Find / Search bar
 
 - Accepts free text; filters on `logRef`, `chequeNumber`, `payee`, and `notes`.
 - Up to **8 autocomplete suggestions** appear in a dropdown.
 - Selecting a suggestion loads that cheque into the form and clears the search.
 - Clicking outside the suggestion list dismisses it.
 
-### 4C. Form fields
+### 3C. Form fields
 
 | Field | Notes |
 |-------|-------|
@@ -182,13 +157,13 @@ Cheques are sorted **numerically ascending by logRef**.
 | Notes | Free text (optional) |
 | Signed By | Free text below the divider; persisted to `signedBy` on the record |
 
-### 4D. Sign / Unsign button
+### 3D. Sign / Unsign button
 
 - **Sign** — enters the current user's ID into the Signed By field and saves immediately.
 - **Unsign** — clears the Signed By field and saves immediately.
 - Label toggles between **Sign** and **Unsign** depending on whether `signedBy` is populated.
 
-### 4E. Edit / Save / Cancel / Close footer
+### 3E. Edit / Save / Cancel / Close footer
 
 ```
 Browse mode:   [ Edit ]             [ Close ]
@@ -199,11 +174,11 @@ New mode:      [ Save ]  [ Cancel ] [ Close ]
 - **[ Edit ]** — switches the form from read-only to editable (Edit mode).
 - **[ Save ]** — persists changes; on New, auto-generates the next `logRef` and navigates to the new record.
 - **[ Cancel ]** — in New mode, discards and navigates back to last saved cheque; in Edit mode, reloads the original values.
-- **[ Close ]** — triggers the Exit Confirmation dialog (§4F).
+- **[ Close ]** — triggers the Exit Confirmation dialog (§3F).
 - **[ × ]** header button — also triggers the Exit Confirmation dialog.
 - Pressing **Escape** — also triggers the Exit Confirmation dialog.
 
-### 4F. Exit Confirmation Dialog (sub-modal)
+### 3F. Exit Confirmation Dialog (sub-modal)
 
 Appears when **[ Close ]**, **[ × ]**, or Escape is pressed.
 
@@ -219,11 +194,11 @@ Appears when **[ Close ]**, **[ × ]**, or Escape is pressed.
 
 - **[ Yes ]** — closes the Exit Confirmation and then closes the ChequeLogModal.
 - **[ No ]** — dismisses the Exit Confirmation; the ChequeLogModal remains open.
-- Clicking outside the dialog does nothing (outside-click dismissed is blocked).
+- Clicking outside the dialog does nothing (outside-click dismiss is blocked).
 
 ---
 
-## 5. AccountsReportModal — "Accounts Report"
+## 4. AccountsReportModal — "Accounts Report"
 
 Opened from the **Menu** → **[ Accounts ]** button.
 Full-screen-overlay modal, A4-proportioned paged report preview.
@@ -265,11 +240,11 @@ Policy No | Amount | Account Credited | Payin Slip No | Signed Posted
 | **[ > ]** | Next page |
 | **[ >\| ]** | Jump to last page |
 | Zoom `[v]` | Scales the A4 preview; default 100% |
-| **[ Print ]** | Opens PrintDialog (§5A) |
-| **[ Export ]** | Opens ExportDialog (§5B) |
+| **[ Print ]** | Opens PrintDialog (§4A) |
+| **[ Export ]** | Opens ExportDialog (§4B) |
 | **[ × ]** / **[ Close ]** | Closes the modal |
 
-### 5A. PrintDialog (sub-modal)
+### 4A. PrintDialog (sub-modal)
 
 ```
 +------------------------------------------+
@@ -296,7 +271,7 @@ Policy No | Amount | Account Credited | Payin Slip No | Signed Posted
 - **[ Print ]** — executes `window.print()` and closes the dialog.
 - **[ Cancel ]** — dismisses the dialog; returns to the AccountsReportModal.
 
-### 5B. ExportDialog (sub-modal)
+### 4B. ExportDialog (sub-modal)
 
 ```
 +------------------------------------------+
@@ -319,12 +294,12 @@ Policy No | Amount | Account Credited | Payin Slip No | Signed Posted
 ```
 
 - Choosing **MS Excel 97-2000** or **MS Excel 97-2000 (Data only)** as the format
-  and clicking **[ OK ]** opens the **ExcelFormatDialog** (§5C) before finalising.
+  and clicking **[ OK ]** opens the **ExcelFormatDialog** (§4C) before finalising.
 - All other formats: **[ OK ]** triggers a client-side download and closes the dialog.
 - **[ Cancel ]** — returns to AccountsReportModal.
 - Disabled/greyed formats: Crystal Reports (RPT), ODBC, Report Definition.
 
-### 5C. ExcelFormatDialog (sub-modal, Excel path only)
+### 4C. ExcelFormatDialog (sub-modal, Excel path only)
 
 ```
 +---------------------------------------------------+
@@ -349,7 +324,7 @@ Policy No | Amount | Account Credited | Payin Slip No | Signed Posted
 
 ---
 
-## 6. OutstandingReportModal — "Outstanding Cheques Report"
+## 5. OutstandingReportModal — "Outstanding Cheques Report"
 
 Accessible via navigation (linked from the Cheque Register or Menu if wired).
 A4-proportioned paged report modal, same chrome as AccountsReportModal.
@@ -379,12 +354,12 @@ A4-proportioned paged report modal, same chrome as AccountsReportModal.
 **Report columns:** Ref | Date Rec'd | Drawer | Policy Name/Cheque details |
 Policy No | Amount | Account Credited | Payin Slip No | Signed Posted
 
-Behaviour is identical to the AccountsReportModal (§5) with the same
-Print (§5A), Export (§5B), and ExcelFormat (§5C) sub-dialogs.
+Behaviour is identical to the AccountsReportModal (§4) with the same
+Print (§4A), Export (§4B), and ExcelFormat (§4C) sub-dialogs.
 
 ---
 
-## 7. Cheque Register — route `/cheques`
+## 6. Cheque Register — route `/cheques`
 
 Full-page tabular view of all cheque records with live filters.
 
@@ -423,13 +398,13 @@ shared `DateRangeContext` (set on the Menu screen).
 
 **Navigation from Cheque Register:**
 ```
-[ View ] link  >>>  §8 Cheque Form (/cheques/:id)
-[ New / Amend ]  >>>  §8 Cheque Form (/cheques/new)
+[ View ] link  >>>  §7 Cheque Form (/cheques/:id)
+[ New / Amend ]  >>>  §7 Cheque Form (/cheques/new)
 ```
 
 ---
 
-## 8. Cheque Form — routes `/cheques/new` and `/cheques/:id`
+## 7. Cheque Form — routes `/cheques/new` and `/cheques/:id`
 
 Full-page form for creating a new cheque or amending an existing one.
 
@@ -479,7 +454,7 @@ Full-page form for creating a new cheque or amending an existing one.
 
 ---
 
-## 9. Admin / Setup — route `/admin`
+## 8. Admin / Setup — route `/admin`
 
 Master-data management page for accounts and departments.
 
@@ -517,7 +492,7 @@ Master-data management page for accounts and departments.
 
 ---
 
-## 10. Date Picker Popover
+## 9. Date Picker Popover
 
 Triggered by clicking the calendar `📅` icon in any date field across the app
 (Menu start/end dates, Cheque Form, ChequeLogModal, report modals).
@@ -550,17 +525,13 @@ Days view                        Months view                   Years view
 
 ---
 
-## 11. Screen Flow Map
+## 10. Screen Flow Map
 
 ```
-[Sign-in Gate]
-     |
-     | (one-click Sign in)
-     v
 [Menu / Dashboard]  (/route: /)
      |           |           |           |
      |           |     [Header logo / Close] --> back to /
-     |           |     [Header Logout] --> clears localStorage --> [Sign-in Gate]
+     |           |     [Header Logout] --> clears localStorage --> reload
      |           |
      |--[ Accounts ]----> [AccountsReportModal]
      |                          |-- [Print] --> [PrintDialog]
@@ -603,7 +574,7 @@ Days view                        Months view                   Years view
 
 ---
 
-## 12. Data Model Summary
+## 11. Data Model Summary
 
 ```
 Account {
@@ -644,7 +615,7 @@ Seed data (populated once on first load):
 
 ---
 
-## 13. Role / Permission Matrix
+## 12. Role / Permission Matrix
 
 | Action | canEdit required | canManage required |
 |--------|:----------------:|:------------------:|
@@ -659,7 +630,7 @@ Actions are gated (button disabled + tooltip) — never hidden.
 
 ---
 
-## 14. Toast Notifications
+## 13. Toast Notifications
 
 Shown in the bottom-right corner. Auto-dismiss after a few seconds.
 
