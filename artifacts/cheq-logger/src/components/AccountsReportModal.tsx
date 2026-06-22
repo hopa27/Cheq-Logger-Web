@@ -148,14 +148,18 @@ function TableRows({ rows }: { rows: DummyRow[] }) {
   );
 }
 
+const TOTAL_PAGES = 2;
+
 export default function AccountsReportModal({ open, onClose }: Props) {
   const { startDate, endDate } = useDateRange();
   const printRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [zoom, setZoom] = useState(100);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     if (!open) return;
+    setCurrentPage(1);
     requestAnimationFrame(() => {
       if (scrollRef.current) {
         const availW = scrollRef.current.clientWidth - 48;
@@ -212,7 +216,10 @@ export default function AccountsReportModal({ open, onClose }: Props) {
 
   const TB_BTN = "lve-btn lve-btn-secondary !rounded-full !p-0 !w-8 !h-8 shrink-0 disabled:opacity-40 disabled:pointer-events-none disabled:shadow-none";
   const scale = zoom / 100;
-  const scaledTotalH = (A4_H * 2 + 24) * scale + 48;
+  const scaledPageH = A4_H * scale + 48;
+
+  const isFirst = currentPage === 1;
+  const isLast  = currentPage === TOTAL_PAGES;
 
   return (
     <Dialog open={open} onOpenChange={v => !v && onClose()}>
@@ -235,11 +242,11 @@ export default function AccountsReportModal({ open, onClose }: Props) {
 
         {/* Viewer toolbar */}
         <div className="bg-[#f5f7fa] border-b border-[#BBBBBB] px-4 py-2 flex items-center gap-2 flex-wrap">
-          <button className={TB_BTN} disabled title="First"><MdSkipPrevious size={14} /></button>
-          <button className={TB_BTN} disabled title="Previous"><MdNavigateBefore size={14} /></button>
-          <span className="font-['Mulish'] text-[12px] text-[#4a4a49] px-1 select-none">1 of 2</span>
-          <button className={TB_BTN} disabled title="Next"><MdNavigateNext size={14} /></button>
-          <button className={TB_BTN} disabled title="Last"><MdSkipNext size={14} /></button>
+          <button className={TB_BTN} disabled={isFirst} title="First"    onClick={() => setCurrentPage(1)}><MdSkipPrevious size={14} /></button>
+          <button className={TB_BTN} disabled={isFirst} title="Previous" onClick={() => setCurrentPage(p => Math.max(1, p - 1))}><MdNavigateBefore size={14} /></button>
+          <span className="font-['Mulish'] text-[12px] text-[#4a4a49] px-1 select-none">{currentPage} of {TOTAL_PAGES}</span>
+          <button className={TB_BTN} disabled={isLast}  title="Next"     onClick={() => setCurrentPage(p => Math.min(TOTAL_PAGES, p + 1))}><MdNavigateNext size={14} /></button>
+          <button className={TB_BTN} disabled={isLast}  title="Last"     onClick={() => setCurrentPage(TOTAL_PAGES)}><MdSkipNext size={14} /></button>
           <div className="w-px h-5 bg-[#BBBBBB] mx-1" />
           <button className={TB_BTN} title="Print" onClick={handlePrint}><MdPrint size={14} /></button>
           <button className={TB_BTN} title="Export / Save As" onClick={handleExport}><MdSave size={14} /></button>
@@ -255,18 +262,15 @@ export default function AccountsReportModal({ open, onClose }: Props) {
           <span className="font-['Mulish'] text-[12px] font-semibold text-[#4a4a49] select-none">
             Total: {DUMMY_ROWS.length}
           </span>
-          <span className="font-['Mulish'] text-[12px] text-[#4a4a49] select-none mx-1">
-            {DUMMY_ROWS.length} of {DUMMY_ROWS.length}
-          </span>
         </div>
 
-        {/* Scrollable preview area */}
+        {/* Scrollable preview area — one page at a time */}
         <div
           ref={scrollRef}
           className="bg-[#808080] overflow-auto"
           style={{ maxHeight: "68vh" }}
         >
-          <div style={{ width: A4_W * scale + 48, height: scaledTotalH, position: "relative" }}>
+          <div style={{ width: A4_W * scale + 48, height: scaledPageH, position: "relative" }}>
             <div
               ref={printRef}
               style={{
@@ -276,39 +280,38 @@ export default function AccountsReportModal({ open, onClose }: Props) {
                 top: 0,
                 left: 0,
                 padding: "24px",
-                display: "flex",
-                flexDirection: "column",
-                gap: "16px",
               }}
             >
-              {/* Page 1 */}
-              <div style={{ width: A4_W, height: A4_H, background: "white", boxShadow: "0 2px 8px rgba(0,0,0,0.35)", padding: "40px 48px", overflow: "hidden", boxSizing: "border-box" }}>
-                <h2 style={{ textAlign: "center", fontFamily: "Mulish, Arial, sans-serif", fontWeight: 700, fontSize: 13, marginBottom: 6, textTransform: "uppercase", letterSpacing: 1, color: "#3d3d3d" }}>
-                  Accounts Report
-                </h2>
-                <div style={{ textAlign: "center", fontFamily: "Mulish, Arial, sans-serif", fontSize: 11, color: "#3d3d3d", marginBottom: 18 }}>
-                  {fmtRangeLabel(startDate)}&nbsp;&nbsp;to&nbsp;&nbsp;{fmtRangeLabel(endDate)}
+              {currentPage === 1 && (
+                <div style={{ width: A4_W, height: A4_H, background: "white", boxShadow: "0 2px 8px rgba(0,0,0,0.35)", padding: "40px 48px", overflow: "hidden", boxSizing: "border-box" }}>
+                  <h2 style={{ textAlign: "center", fontFamily: "Mulish, Arial, sans-serif", fontWeight: 700, fontSize: 13, marginBottom: 6, textTransform: "uppercase", letterSpacing: 1, color: "#3d3d3d" }}>
+                    Accounts Report
+                  </h2>
+                  <div style={{ textAlign: "center", fontFamily: "Mulish, Arial, sans-serif", fontSize: 11, color: "#3d3d3d", marginBottom: 18 }}>
+                    {fmtRangeLabel(startDate)}&nbsp;&nbsp;to&nbsp;&nbsp;{fmtRangeLabel(endDate)}
+                  </div>
+                  <div className="font-['Mulish'] font-bold text-[9.5px] text-[#3d3d3d] pb-1">
+                    1. Account No. 843
+                  </div>
+                  <TableHead />
+                  <TableRows rows={PAGE_1_ROWS} />
                 </div>
-                <div className="font-['Mulish'] font-bold text-[9.5px] text-[#3d3d3d] pb-1">
-                  1. Account No. 843
-                </div>
-                <TableHead />
-                <TableRows rows={PAGE_1_ROWS} />
-              </div>
+              )}
 
-              {/* Page 2 */}
-              <div style={{ width: A4_W, height: A4_H, background: "white", boxShadow: "0 2px 8px rgba(0,0,0,0.35)", padding: "40px 48px", overflow: "hidden", boxSizing: "border-box" }}>
-                <div className="font-['Mulish'] font-bold text-[9.5px] text-[#3d3d3d] pb-1">
-                  1. Account No. 843 (continued)
+              {currentPage === 2 && (
+                <div style={{ width: A4_W, height: A4_H, background: "white", boxShadow: "0 2px 8px rgba(0,0,0,0.35)", padding: "40px 48px", overflow: "hidden", boxSizing: "border-box" }}>
+                  <div className="font-['Mulish'] font-bold text-[9.5px] text-[#3d3d3d] pb-1">
+                    1. Account No. 843 (continued)
+                  </div>
+                  <TableHead />
+                  <TableRows rows={PAGE_2_ROWS} />
+                  <div className={`grid ${COL_WIDTHS} mt-2 border-t border-[#3d3d3d] pt-1`}>
+                    <span className="col-span-5 font-['Mulish'] font-bold text-[9.5px] text-[#3d3d3d]">Total</span>
+                    <span className="font-['Mulish'] font-bold text-[9.5px] text-[#3d3d3d] text-right">£311,775.15</span>
+                    <span className="col-span-3" />
+                  </div>
                 </div>
-                <TableHead />
-                <TableRows rows={PAGE_2_ROWS} />
-                <div className={`grid ${COL_WIDTHS} mt-2 border-t border-[#3d3d3d] pt-1`}>
-                  <span className="col-span-5 font-['Mulish'] font-bold text-[9.5px] text-[#3d3d3d]">Total</span>
-                  <span className="font-['Mulish'] font-bold text-[9.5px] text-[#3d3d3d] text-right">£311,775.15</span>
-                  <span className="col-span-3" />
-                </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
