@@ -317,7 +317,7 @@ export default function ChequeLogModal({ open, onClose }: Props) {
             </div>
             <div>
               <label className={LBL}>Cheque Amount</label>
-              <Input className={INPUT + " text-right font-bold text-[#d72714]"}
+              <Input className={INPUT + " font-bold text-[#d72714]"}
                 type="number" step="0.01"
                 value={form.amount}
                 onChange={e => set("amount")(e.target.value)}
