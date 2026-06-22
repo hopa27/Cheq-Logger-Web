@@ -286,7 +286,16 @@ export default function ChequeLogModal({ open, onClose }: Props) {
           </div>
 
           <div>
-            <label className={LBL}>Drawer</label>
+            <div className="flex items-center gap-2 mb-1">
+              <label className={LBL + " !mb-0"}>Drawer</label>
+              <button
+                type="button"
+                onClick={() => set("payee")("LV=")}
+                className="lve-btn lve-btn-secondary !h-[22px] !px-2 !text-[11px] !font-['Livvic'] !font-bold shrink-0"
+              >
+                LV=
+              </button>
+            </div>
             <Input className={INPUT} value={form.payee}
               onChange={e => set("payee")(e.target.value)} placeholder="Payee / drawer name" />
           </div>
