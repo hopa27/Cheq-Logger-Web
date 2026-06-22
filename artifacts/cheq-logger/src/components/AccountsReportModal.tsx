@@ -219,15 +219,7 @@ export default function AccountsReportModal({ open, onClose }: Props) {
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="bg-[#f5f7fa] border-t border-[#BBBBBB] px-5 py-3 flex justify-end gap-2">
-          <Button variant="secondary" size="sm" onClick={handlePrint}>
-            <MdPrint size={16} className="mr-1" /> Print
-          </Button>
-          <Button variant="secondary" size="sm" onClick={onClose}>
-            Close
-          </Button>
-        </div>
+
       </DialogContent>
     </Dialog>
   );
