@@ -81,7 +81,7 @@ Overlay modal, max-width 540 px, cannot be closed by clicking outside.
 +------------------------------------------------------------------------+
 | Accounts Cheque Log                                           [ × ]    |
 +------------------------------------------------------------------------+
-|  [ |< ]  [ < ]  [ > ]  [ >| ]   [ New ]      Ref: [ 31,008,389 ]      |
+|  Ref: [ 31,008,389 ]          [ New ] | [ |< ]  [ < ]  1 of 8  [ > ]  [ >| ]  |
 |  Find: [ search payee / cheque # / log ref _______  ]  (suggests ↓)   |
 |  +------------------------------------------------------------------+  |
 |  | ↓ suggestion 1 — payee / logRef                                  |  |
@@ -108,14 +108,15 @@ Overlay modal, max-width 540 px, cannot be closed by clicking outside.
 
 ### 3A. Toolbar
 
-| Control | Behaviour |
-|---------|-----------|
-| **[ \|< ]** | Jump to first cheque |
-| **[ < ]** | Previous cheque |
-| **[ > ]** | Next cheque |
-| **[ >\| ]** | Jump to last cheque |
-| **[ New ]** | Blank form, auto-generated next Log Ref |
-| **Ref badge** | Current cheque's `logRef` (read-only) |
+| Position | Control | Behaviour |
+|----------|---------|-----------|
+| Left | **Ref badge** | Current cheque's `logRef` (read-only); shows pending next ref in New mode |
+| Centre | **[ New ]** | Blank form, auto-generated next Log Ref |
+| Right | **[ \|< ]** | Jump to first cheque |
+| Right | **[ < ]** | Previous cheque |
+| Right | **1 of N** | Current position indicator |
+| Right | **[ > ]** | Next cheque |
+| Right | **[ >\| ]** | Jump to last cheque |
 
 Cheques are sorted numerically ascending by logRef.
 
@@ -188,8 +189,7 @@ Overlay modal with A4-proportioned paged report preview.
 +------------------------------------------------------------------------+
 | Accounts Report                                               [ × ]    |
 +------------------------------------------------------------------------+
-|  [ |< ]  [ < ]  Page 1 / 2  [ > ]  [ >| ]   Zoom: [ 100% [v] ]       |
-|  [ Print ]   [ Export ]                                                 |
+|  [ |< ]  [ < ]  1 of 2  [ > ]  [ >| ]  |  [ Print ]  [ Export ]  |  [ 100% [v] ]  |  Total: 68  |
 +------------------------------------------------------------------------+
 |  +------------------------------------------------------------------+  |
 |  |                  ACCOUNTS CHEQUE LOG                            |  |
@@ -210,16 +210,21 @@ Policy No | Amount | Account Credited | Payin Slip No | Signed Posted
 
 **Zoom levels:** 50% · 75% · 100% · 125% · 150%
 
-| Control | Behaviour |
-|---------|-----------|
-| **[ \|< ]** | Page 1 |
-| **[ < ]** | Previous page |
-| **[ > ]** | Next page |
-| **[ >\| ]** | Last page |
-| Zoom `[v]` | Scales the A4 preview; default 100% |
-| **[ Print ]** | Opens PrintDialog (§4A) |
-| **[ Export ]** | Opens ExportDialog (§4B) |
-| **[ × ]** / **[ Close ]** | Closes the modal |
+| Order | Control | Behaviour |
+|-------|---------|-----------|
+| 1 | **[ \|< ]** | Jump to page 1 |
+| 2 | **[ < ]** | Previous page |
+| 3 | **1 of 2** | Current page indicator |
+| 4 | **[ > ]** | Next page |
+| 5 | **[ >\| ]** | Last page |
+| — | *divider* | |
+| 6 | **[ Print ]** | Opens PrintDialog (§4A) |
+| 7 | **[ Export ]** | Opens ExportDialog (§4B) |
+| — | *divider* | |
+| 8 | Zoom `[v]` | Scales the A4 preview; default 100% |
+| — | *divider* | |
+| 9 | **Total: N** | Total row count (read-only label) |
+| — | **[ × ]** / **[ Close ]** | Closes the modal (header / footer) |
 
 ### 4A. PrintDialog
 
