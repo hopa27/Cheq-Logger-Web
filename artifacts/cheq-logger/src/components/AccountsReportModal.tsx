@@ -33,11 +33,82 @@ const EXPORT_DESTINATIONS = [
   { value: "lotus-domino",     label: "Lotus Domino" },
 ];
 
+const EXCEL_FORMATS = [
+  { value: "typical",  label: "Typical",  desc: "Data is exported with default options applied." },
+  { value: "minimal",  label: "Minimal",  desc: "Data is exported with no formatting applied." },
+  { value: "custom",   label: "Custom",   desc: "Data is exported according to selected options." },
+];
+
+function ExcelFormatDialog({
+  open, onCancel, onOk,
+}: { open: boolean; onCancel: () => void; onOk: (style: string) => void }) {
+  const [style, setStyle] = useState("typical");
+
+  return (
+    <Dialog open={open} onOpenChange={v => !v && onCancel()}>
+      <DialogContent
+        className="p-0 gap-0 max-w-[460px] rounded-[8px] overflow-hidden border border-[#BBBBBB] shadow-2xl [&>button]:hidden"
+        onInteractOutside={e => e.preventDefault()}
+      >
+        <DialogTitle className="sr-only">Excel Format Options</DialogTitle>
+
+        {/* LV header */}
+        <div className="bg-[#00263e] px-5 py-3 flex items-center justify-between">
+          <span className="font-['Livvic'] text-white text-[16px] font-semibold">Excel Format Options</span>
+          <button type="button" onClick={onCancel}
+            className="lve-btn lve-btn-secondary !rounded-full !p-0 !w-7 !h-7 shrink-0" aria-label="Close">
+            <MdClose size={16} />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="bg-white px-5 py-5">
+          <fieldset className="border border-[#BBBBBB] rounded-[6px] px-4 pt-2 pb-4">
+            <legend className="font-['Livvic'] font-semibold text-[#002f5c] text-[13px] px-1">Excel Format</legend>
+            <div className="space-y-3 mt-1">
+              {EXCEL_FORMATS.map(f => (
+                <label key={f.value} className="flex items-start gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="excel-style"
+                    value={f.value}
+                    checked={style === f.value}
+                    onChange={() => setStyle(f.value)}
+                    className="mt-[2px] accent-[#006cf4]"
+                  />
+                  <span className="font-['Mulish'] text-[13px] text-[#3d3d3d]">
+                    <span className="font-semibold">{f.label}:</span> {f.desc}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+        </div>
+
+        {/* LV footer */}
+        <div className="bg-[#f5f7fa] border-t border-[#BBBBBB] px-5 py-3 flex justify-end gap-2">
+          <Button variant="secondary" size="sm" onClick={onCancel}>Cancel</Button>
+          <Button size="sm" onClick={() => onOk(style)}>OK</Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 function ExportDialog({
   open, onCancel, onOk,
 }: { open: boolean; onCancel: () => void; onOk: (fmt: string, dest: string) => void }) {
-  const [fmt, setFmt] = useState("pdf");
+  const [fmt, setFmt] = useState("xls-data");
   const [dest, setDest] = useState("disk");
+  const [excelFmtOpen, setExcelFmtOpen] = useState(false);
+
+  const handleOk = () => {
+    if (fmt === "xls" || fmt === "xls-data") {
+      setExcelFmtOpen(true);
+    } else {
+      onOk(fmt, dest);
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={v => !v && onCancel()}>
@@ -91,9 +162,15 @@ function ExportDialog({
         {/* LV footer */}
         <div className="bg-[#f5f7fa] border-t border-[#BBBBBB] px-5 py-3 flex justify-end gap-2">
           <Button variant="secondary" size="sm" onClick={onCancel}>Cancel</Button>
-          <Button size="sm" onClick={() => onOk(fmt, dest)}>OK</Button>
+          <Button size="sm" onClick={handleOk}>OK</Button>
         </div>
       </DialogContent>
+
+      <ExcelFormatDialog
+        open={excelFmtOpen}
+        onCancel={() => setExcelFmtOpen(false)}
+        onOk={(_style) => { setExcelFmtOpen(false); onOk(fmt, dest); }}
+      />
     </Dialog>
   );
 }
