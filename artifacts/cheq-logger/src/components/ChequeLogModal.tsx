@@ -4,6 +4,7 @@ import { format } from "date-fns";
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -42,6 +43,7 @@ interface FormState {
   accountId: string;
   payee: string;
   notes: string;
+  policyRef: string;
   amount: string;
   status: string;
 }
@@ -54,6 +56,7 @@ const emptyForm = (): FormState => ({
   accountId: "",
   payee: "",
   notes: "",
+  policyRef: "",
   amount: "",
   status: "outstanding",
 });
@@ -90,7 +93,8 @@ export default function ChequeLogModal({ open, onClose }: Props) {
       accountId: String(c.accountId),
       payee: c.payee,
       notes: c.notes ?? "",
-      amount: String(c.amount),
+      policyRef: c.policyRef ?? "",
+      amount: c.amount ? String(c.amount) : "",
       status: c.status,
     });
     setIsNew(false);
@@ -131,6 +135,7 @@ export default function ChequeLogModal({ open, onClose }: Props) {
       departmentId: Number(form.departmentId),
       payee: form.payee,
       notes: form.notes || null,
+      policyRef: form.policyRef || null,
       amount: parseFloat(form.amount) || 0,
       status: form.status as "outstanding" | "cleared" | "cancelled",
       clearedDate: null,
@@ -161,6 +166,9 @@ export default function ChequeLogModal({ open, onClose }: Props) {
   return (
     <Dialog open={open} onOpenChange={v => !v && onClose()}>
       <DialogContent className="p-0 gap-0 max-w-[540px] rounded-[8px] overflow-hidden border border-[#BBBBBB] shadow-2xl [&>button]:hidden">
+
+        {/* Visually hidden title for screen reader accessibility */}
+        <DialogTitle className="sr-only">Accounts Cheque Log</DialogTitle>
 
         {/* Header — title + close */}
         <div className="bg-[#00263e] px-5 py-3 flex items-center justify-between">
@@ -271,17 +279,9 @@ export default function ChequeLogModal({ open, onClose }: Props) {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className={LBL}>Status</label>
-              <Select value={form.status} onValueChange={set("status")}>
-                <SelectTrigger className={INPUT}>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="outstanding">Outstanding</SelectItem>
-                  <SelectItem value="cleared">Cleared</SelectItem>
-                  <SelectItem value="cancelled">Cancelled</SelectItem>
-                </SelectContent>
-              </Select>
+              <label className={LBL}>Policy Ref</label>
+              <Input className={INPUT} value={form.policyRef}
+                onChange={e => set("policyRef")(e.target.value)} placeholder="e.g. 100030" />
             </div>
             <div>
               <label className={LBL}>Cheque Amount</label>
@@ -291,6 +291,20 @@ export default function ChequeLogModal({ open, onClose }: Props) {
                 onChange={e => set("amount")(e.target.value)}
                 placeholder="0.00" />
             </div>
+          </div>
+
+          <div>
+            <label className={LBL}>Status</label>
+            <Select value={form.status} onValueChange={set("status")}>
+              <SelectTrigger className={INPUT}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="outstanding">Outstanding</SelectItem>
+                <SelectItem value="cleared">Cleared</SelectItem>
+                <SelectItem value="cancelled">Cancelled</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 

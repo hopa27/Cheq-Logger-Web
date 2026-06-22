@@ -55,7 +55,8 @@ export default function ChequeForm() {
     issueDate: format(new Date(), "yyyy-MM-dd"),
     status: "outstanding" as ChequeStatus,
     clearedDate: "",
-    notes: ""
+    notes: "",
+    policyRef: "",
   });
 
   useEffect(() => {
@@ -69,7 +70,8 @@ export default function ChequeForm() {
         issueDate: cheque.issueDate.substring(0, 10),
         status: cheque.status,
         clearedDate: cheque.clearedDate ? cheque.clearedDate.substring(0, 10) : "",
-        notes: cheque.notes || ""
+        notes: cheque.notes || "",
+        policyRef: cheque.policyRef || "",
       });
     }
   }, [cheque, isNew]);
@@ -89,6 +91,7 @@ export default function ChequeForm() {
         status: formData.status,
         clearedDate: formData.clearedDate || null,
         notes: formData.notes || null,
+        policyRef: formData.policyRef || null,
       };
 
       if (isNew) {

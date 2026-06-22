@@ -27,6 +27,7 @@ export interface ChequeRecord {
   status: ChequeStatus;
   clearedDate: string | null;
   notes: string | null;
+  policyRef: string | null;
 }
 
 export type ChequeInput = Omit<ChequeRecord, "id">;
@@ -66,7 +67,7 @@ interface DB {
   seq: number;
 }
 
-const STORAGE_KEY = "cheq_logger_db_v1";
+const STORAGE_KEY = "cheq_logger_db_v2";
 
 function seed(): DB {
   const now = new Date();
@@ -75,27 +76,23 @@ function seed(): DB {
   const d = (day: number) => format(new Date(y, m, day), "yyyy-MM-dd");
 
   const accounts: Account[] = [
-    { id: 1, code: "1000", name: "Main Operating Account", active: true },
-    { id: 2, code: "2000", name: "Payroll Account", active: true },
-    { id: 3, code: "3000", name: "Reserve Account", active: true },
+    { id: 1, code: "843", name: "843", active: true },
+    { id: 2, code: "844", name: "844", active: true },
   ];
 
   const departments: Department[] = [
-    { id: 1, code: "FIN", name: "Finance", active: true },
-    { id: 2, code: "HR", name: "Human Resources", active: true },
-    { id: 3, code: "OPS", name: "Operations", active: true },
-    { id: 4, code: "IT", name: "Information Technology", active: true },
+    { id: 1, code: "ACCTS", name: "Accounts", active: true },
+    { id: 2, code: "CPA", name: "CPA", active: true },
   ];
 
   const cheques: ChequeRecord[] = [
-    { id: 1, chequeNumber: "100245", issueDate: d(2), payee: "Acme Office Supplies", accountId: 1, departmentId: 3, amount: 1245.5, status: "cleared", clearedDate: d(6), notes: "Quarterly stationery order" },
-    { id: 2, chequeNumber: "100246", issueDate: d(4), payee: "Northgate Property Ltd", accountId: 1, departmentId: 3, amount: 8500, status: "outstanding", clearedDate: null, notes: "Monthly rent" },
-    { id: 3, chequeNumber: "100247", issueDate: d(5), payee: "Bright Spark Electrics", accountId: 1, departmentId: 4, amount: 640.0, status: "outstanding", clearedDate: null, notes: null },
-    { id: 4, chequeNumber: "100248", issueDate: d(8), payee: "J. Patterson (Salary)", accountId: 2, departmentId: 2, amount: 3200, status: "cleared", clearedDate: d(10), notes: "June salary" },
-    { id: 5, chequeNumber: "100249", issueDate: d(10), payee: "Cloudworks Hosting", accountId: 1, departmentId: 4, amount: 299.99, status: "outstanding", clearedDate: null, notes: "Annual hosting renewal" },
-    { id: 6, chequeNumber: "100250", issueDate: d(12), payee: "Meridian Legal Services", accountId: 3, departmentId: 1, amount: 1750, status: "cancelled", clearedDate: null, notes: "Cancelled - duplicate invoice" },
-    { id: 7, chequeNumber: "100251", issueDate: d(15), payee: "Greenfield Catering", accountId: 1, departmentId: 2, amount: 420.75, status: "cleared", clearedDate: d(18), notes: "Staff event" },
-    { id: 8, chequeNumber: "100252", issueDate: d(18), payee: "Apex Maintenance", accountId: 3, departmentId: 3, amount: 980.0, status: "outstanding", clearedDate: null, notes: null },
+    { id: 1,  chequeNumber: "1", issueDate: d(1),  payee: "",                accountId: 1, departmentId: 1, amount: 0,         status: "outstanding", clearedDate: null, notes: "",               policyRef: null    },
+    { id: 2,  chequeNumber: "1", issueDate: d(3),  payee: "clerical medical", accountId: 1, departmentId: 2, amount: 0,         status: "outstanding", clearedDate: null, notes: "Testmrbaaaae",   policyRef: "100004" },
+    { id: 3,  chequeNumber: "1", issueDate: d(3),  payee: "zurich",           accountId: 1, departmentId: 2, amount: 61310.42,  status: "outstanding", clearedDate: null, notes: "Testmrbaacbi",   policyRef: "100218" },
+    { id: 4,  chequeNumber: "2", issueDate: d(5),  payee: "PRUDENTIAL",       accountId: 1, departmentId: 2, amount: 28122.00,  status: "outstanding", clearedDate: null, notes: "Testmsbaaabc",   policyRef: "100012" },
+    { id: 5,  chequeNumber: "2", issueDate: d(6),  payee: "ZURICH",           accountId: 1, departmentId: 2, amount: 54695.20,  status: "outstanding", clearedDate: null, notes: "Testtdbaaaef",   policyRef: "100045" },
+    { id: 6,  chequeNumber: "3", issueDate: d(6),  payee: "CBS LTD",          accountId: 1, departmentId: 2, amount: 17330.00,  status: "cleared",     clearedDate: d(10), notes: "Testwrbaaajd",  policyRef: "100093" },
+    { id: 7,  chequeNumber: "4", issueDate: d(9),  payee: "prudential",       accountId: 1, departmentId: 2, amount: 11090.15,  status: "cleared",     clearedDate: d(14), notes: "Testmlbaaada",  policyRef: "100030" },
   ];
 
   return { accounts, departments, cheques, seq: 100 };
