@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
 import { format } from "date-fns";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -31,23 +30,20 @@ function ExportDialog({
   open, onCancel, onOk,
 }: { open: boolean; onCancel: () => void; onOk: (fmt: string) => void }) {
   const [fmt, setFmt] = useState("pdf");
-  if (!open) return null;
 
-  // Must portal to document.body — rendering inside a Radix <Dialog> traps
-  // focus and blocks pointer events on any overlay that isn't DialogContent.
-  return createPortal(
-    <div className="fixed inset-0 z-[200] flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/50" />
-      <div className="relative bg-white rounded-[8px] overflow-hidden border border-[#BBBBBB] shadow-2xl w-[400px]">
+  return (
+    <Dialog open={open} onOpenChange={v => !v && onCancel()}>
+      <DialogContent
+        className="p-0 gap-0 max-w-[400px] rounded-[8px] overflow-hidden border border-[#BBBBBB] shadow-2xl [&>button]:hidden"
+        onInteractOutside={e => e.preventDefault()}
+      >
+        <DialogTitle className="sr-only">Export</DialogTitle>
+
         {/* LV header */}
         <div className="bg-[#00263e] px-5 py-3 flex items-center justify-between">
           <span className="font-['Livvic'] text-white text-[16px] font-semibold">Export</span>
-          <button
-            type="button"
-            onClick={onCancel}
-            className="lve-btn lve-btn-secondary !rounded-full !p-0 !w-7 !h-7 shrink-0"
-            aria-label="Close"
-          >
+          <button type="button" onClick={onCancel}
+            className="lve-btn lve-btn-secondary !rounded-full !p-0 !w-7 !h-7 shrink-0" aria-label="Close">
             <MdClose size={16} />
           </button>
         </div>
@@ -80,16 +76,11 @@ function ExportDialog({
 
         {/* LV footer */}
         <div className="bg-[#f5f7fa] border-t border-[#BBBBBB] px-5 py-3 flex justify-end gap-2">
-          <Button variant="secondary" size="sm" onClick={onCancel}>
-            Cancel
-          </Button>
-          <Button size="sm" onClick={() => onOk(fmt)}>
-            OK
-          </Button>
+          <Button variant="secondary" size="sm" onClick={onCancel}>Cancel</Button>
+          <Button size="sm" onClick={() => onOk(fmt)}>OK</Button>
         </div>
-      </div>
-    </div>,
-    document.body
+      </DialogContent>
+    </Dialog>
   );
 }
 
