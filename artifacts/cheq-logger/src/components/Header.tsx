@@ -17,30 +17,27 @@ export default function Header({ title }: { title?: string }) {
   }
 
   return (
-    <header className="w-full bg-[#00263e] px-[142px] pt-4 pb-6">
-      <div className="flex items-center justify-between">
-        <button
-          onClick={() => setLocation("/")}
-          className="focus:outline-none"
-          aria-label="Back to menu"
-        >
-          <img src={logoUrl} alt="CHEQ Logger" className="h-6" />
-        </button>
+    <header className="w-full bg-[#00263e] px-[142px] py-5">
+      <div className="flex items-center gap-6 justify-between">
+        <div className="flex items-center gap-6">
+          <button onClick={() => setLocation("/")} className="focus:outline-none flex-shrink-0" aria-label="Back to menu">
+            <img src={logoUrl} alt="CHEQ Logger" className="h-6" />
+          </button>
+          {displayTitle && (
+            <h1 className="font-['Livvic'] text-2xl font-normal tracking-tight text-white">
+              {displayTitle}
+            </h1>
+          )}
+        </div>
         {location !== '/' && (
           <button
             onClick={() => setLocation("/")}
-            className="text-white/70 hover:text-white text-sm font-['Mulish'] transition-colors"
+            className="text-white/70 hover:text-white text-sm font-['Mulish'] transition-colors flex-shrink-0"
           >
             Back to Menu
           </button>
         )}
       </div>
-      <div className="h-px bg-slate-600/50 mb-6 mt-4" />
-      {displayTitle && (
-        <h1 className="font-['Livvic'] text-3xl font-normal tracking-tight text-white">
-          {displayTitle}
-        </h1>
-      )}
     </header>
   );
 }
