@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CHEQ Logger — Downloads</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f5f7fa;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 60px 20px;
+      min-height: 100vh;
+      box-sizing: border-box;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid #BBBBBB;
+      border-radius: 10px;
+      padding: 36px 40px;
+      max-width: 520px;
+      width: 100%;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+    .header {
+      background: #00263e;
+      border-radius: 7px;
+      padding: 14px 20px;
+      margin-bottom: 28px;
+    }
+    .header h1 {
+      color: #fff;
+      font-size: 20px;
+      margin: 0;
+      font-weight: 600;
+    }
+    .header p {
+      color: rgba(255,255,255,0.7);
+      font-size: 13px;
+      margin: 4px 0 0;
+    }
+    .file-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid #e0e4ea;
+      border-radius: 7px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+      background: #fafbfc;
+    }
+    .file-info .name {
+      font-weight: 600;
+      font-size: 14px;
+      color: #00263e;
+    }
+    .file-info .desc {
+      font-size: 12px;
+      color: #777;
+      margin-top: 3px;
+    }
+    a.dl-btn {
+      display: inline-block;
+      background: #006cf4;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 18px;
+      border-radius: 30px;
+      text-decoration: none;
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-left: 16px;
+    }
+    a.dl-btn:hover {
+      background: #004ecc;
+    }
+    .note {
+      font-size: 12px;
+      color: #999;
+      margin-top: 20px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="header">
+      <h1>CHEQ Logger — Downloads</h1>
+      <p>Liverpool Victoria Friendly Society Limited</p>
+    </div>
+
+    <div class="file-row">
+      <div class="file-info">
+        <div class="name">Application Digest</div>
+        <div class="desc">Full component, data-layer and screen-flow specification</div>
+      </div>
+      <a class="dl-btn" href="CHEQ_Logger_DIGEST_Angular.md" download="CHEQ_Logger_DIGEST(Angular).md">Download</a>
+    </div>
+
+    <div class="file-row">
+      <div class="file-info">
+        <div class="name">Screen Flow</div>
+        <div class="desc">All screens, modals, toolbars and navigation flows</div>
+      </div>
+      <a class="dl-btn" href="CHEQ_Logger_SCREEN_FLOW_Angular.md" download="CHEQ_Logger_SCREEN_FLOW(Angular).md">Download</a>
+    </div>
+
+    <p class="note">Files download as Markdown (.md) — open in any text editor or Markdown viewer.</p>
+  </div>
+</body>
+</html>
