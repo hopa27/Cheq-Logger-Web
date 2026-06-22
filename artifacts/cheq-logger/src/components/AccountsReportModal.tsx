@@ -95,6 +95,104 @@ function ExcelFormatDialog({
   );
 }
 
+function PrintDialog({
+  open, onCancel, onPrint,
+}: { open: boolean; onCancel: () => void; onPrint: (range: "all" | "pages", from: number, to: number, copies: number, collate: boolean) => void }) {
+  const [range, setRange] = useState<"all" | "pages">("all");
+  const [from, setFrom]   = useState(1);
+  const [to, setTo]       = useState(1);
+  const [copies, setCopies] = useState(1);
+  const [collate, setCollate] = useState(true);
+
+  const LBL = "font-['Mulish'] text-[13px] text-[#3d3d3d]";
+  const NUM  = "w-12 h-7 border border-[#BBBBBB] rounded-[4px] text-center font-['Mulish'] text-[13px] px-1 focus:outline-none focus:border-[#006cf4]";
+
+  return (
+    <Dialog open={open} onOpenChange={v => !v && onCancel()}>
+      <DialogContent
+        className="p-0 gap-0 max-w-[380px] rounded-[8px] overflow-hidden border border-[#BBBBBB] shadow-2xl [&>button]:hidden"
+        onInteractOutside={e => e.preventDefault()}
+      >
+        <DialogTitle className="sr-only">Print</DialogTitle>
+
+        {/* Header */}
+        <div className="bg-[#00263e] px-5 py-3 flex items-center justify-between">
+          <span className="font-['Livvic'] text-white text-[16px] font-semibold">Print</span>
+          <button type="button" onClick={onCancel}
+            className="lve-btn lve-btn-secondary !rounded-full !p-0 !w-7 !h-7 shrink-0" aria-label="Close">
+            <MdClose size={16} />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="bg-white px-5 py-5 space-y-4">
+
+          {/* Printer */}
+          <fieldset className="border border-[#BBBBBB] rounded-[6px] px-4 pt-1 pb-3">
+            <legend className="font-['Livvic'] font-semibold text-[#002f5c] text-[13px] px-1">Printer</legend>
+            <p className={LBL + " text-[12px] leading-snug mt-1"}>
+              System Printer<br />
+              <span className="text-[11px] text-[#777]">(Hitchin_PreConfiguration on HIKNPS001.group.net)</span>
+            </p>
+          </fieldset>
+
+          {/* Print Range */}
+          <fieldset className="border border-[#BBBBBB] rounded-[6px] px-4 pt-1 pb-3">
+            <legend className="font-['Livvic'] font-semibold text-[#002f5c] text-[13px] px-1">Print Range</legend>
+            <div className="space-y-2 mt-1">
+              <label className={"flex items-center gap-2 cursor-pointer " + LBL}>
+                <input type="radio" name="pr-range" value="all"
+                  checked={range === "all"} onChange={() => setRange("all")}
+                  className="accent-[#006cf4]" />
+                All
+              </label>
+              <label className={"flex items-center gap-2 cursor-pointer " + LBL}>
+                <input type="radio" name="pr-range" value="pages"
+                  checked={range === "pages"} onChange={() => setRange("pages")}
+                  className="accent-[#006cf4]" />
+                Pages
+              </label>
+              <div className="flex items-center gap-3 pl-5">
+                <span className={LBL}>From:</span>
+                <input type="number" min={1} value={from}
+                  disabled={range !== "pages"}
+                  onChange={e => setFrom(Math.max(1, Number(e.target.value)))}
+                  className={NUM + (range !== "pages" ? " opacity-40 cursor-not-allowed bg-[#f5f7fa]" : " bg-white")} />
+                <span className={LBL}>To:</span>
+                <input type="number" min={1} value={to}
+                  disabled={range !== "pages"}
+                  onChange={e => setTo(Math.max(1, Number(e.target.value)))}
+                  className={NUM + (range !== "pages" ? " opacity-40 cursor-not-allowed bg-[#f5f7fa]" : " bg-white")} />
+              </div>
+            </div>
+          </fieldset>
+
+          {/* Copies + Collate */}
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2">
+              <span className={LBL}>Copies:</span>
+              <input type="number" min={1} max={99} value={copies}
+                onChange={e => setCopies(Math.max(1, Math.min(99, Number(e.target.value))))}
+                className={NUM + " bg-white"} />
+            </div>
+            <label className={"flex items-center gap-2 cursor-pointer " + LBL}>
+              <input type="checkbox" checked={collate} onChange={e => setCollate(e.target.checked)}
+                className="accent-[#006cf4]" />
+              Collate Copies
+            </label>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="bg-[#f5f7fa] border-t border-[#BBBBBB] px-5 py-3 flex justify-end gap-2">
+          <Button variant="secondary" size="sm" onClick={onCancel}>Cancel</Button>
+          <Button size="sm" onClick={() => onPrint(range, from, to, copies, collate)}>OK</Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 function ExportDialog({
   open, onCancel, onOk,
 }: { open: boolean; onCancel: () => void; onOk: (fmt: string, dest: string) => void }) {
@@ -324,6 +422,7 @@ export default function AccountsReportModal({ open, onClose }: Props) {
   const [zoom, setZoom] = useState(100);
   const [currentPage, setCurrentPage] = useState(1);
   const [exportOpen, setExportOpen] = useState(false);
+  const [printOpen, setPrintOpen] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -337,7 +436,10 @@ export default function AccountsReportModal({ open, onClose }: Props) {
     });
   }, [open]);
 
-  const handlePrint = () => {
+  const handlePrint = () => setPrintOpen(true);
+
+  const doPrint = () => {
+    setPrintOpen(false);
     const el = printRef.current;
     if (!el) return;
     const w = window.open("", "_blank", "width=960,height=650");
@@ -570,6 +672,11 @@ export default function AccountsReportModal({ open, onClose }: Props) {
         </div>
       </DialogContent>
 
+      <PrintDialog
+        open={printOpen}
+        onCancel={() => setPrintOpen(false)}
+        onPrint={doPrint}
+      />
       <ExportDialog
         open={exportOpen}
         onCancel={() => setExportOpen(false)}
