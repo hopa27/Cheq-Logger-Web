@@ -1,0 +1,72 @@
+LVE Circular Navigation Button Prompt
+Use this pattern for any icon-only navigation/pagination buttons (First, Previous, Next, Last, Close, Cancel, etc.) in the LV= CLANAD system.
+
+Class pattern
+className="lve-btn lve-btn-secondary !rounded-full !p-0 !w-8 !h-8 inline-flex items-center justify-center shrink-0"
+
+Breakdown
+Class	Purpose
+lve-btn lve-btn-secondary	LVE token: white bg, #006cf4 border + text, hover #eaf5f8
+!rounded-full	Overrides the default 30px pill to a perfect circle
+!p-0	Removes default padding so the fixed size controls the shape
+!w-8 !h-8	Fixed 32×32px — equal width and height makes it circular
+inline-flex items-center justify-center	Centres the icon precisely inside the circle
+shrink-0	Prevents flex containers from squashing the button
+Icon sizing
+Use size={18} from react-icons/md inside these buttons
+Larger variant (e.g. close buttons in headers): !w-7 !h-7 with size={18}
+Full example — record navigator
+<div className="flex items-center gap-2">
+  <button
+    type="button"
+    disabled={index <= 0}
+    onClick={() => go(0)}
+    className="lve-btn lve-btn-secondary !rounded-full !p-0 !w-8 !h-8 inline-flex items-center justify-center shrink-0"
+    title="First"
+  >
+    <MdFirstPage size={18} />
+  </button>
+  <button
+    type="button"
+    disabled={index <= 0}
+    onClick={() => go(index - 1)}
+    className="lve-btn lve-btn-secondary !rounded-full !p-0 !w-8 !h-8 inline-flex items-center justify-center shrink-0"
+    title="Previous"
+  >
+    <MdNavigateBefore size={18} />
+  </button>
+ 
+  <span className="text-[13px] font-['Mulish'] font-bold text-[#4a4a49] px-2 min-w-[80px] text-center select-none">
+    {index + 1} of {total}
+  </span>
+ 
+  <button
+    type="button"
+    disabled={index >= total - 1}
+    onClick={() => go(index + 1)}
+    className="lve-btn lve-btn-secondary !rounded-full !p-0 !w-8 !h-8 inline-flex items-center justify-center shrink-0"
+    title="Next"
+  >
+    <MdNavigateNext size={18} />
+  </button>
+  <button
+    type="button"
+    disabled={index >= total - 1}
+    onClick={() => go(total - 1)}
+    className="lve-btn lve-btn-secondary !rounded-full !p-0 !w-8 !h-8 inline-flex items-center justify-center shrink-0"
+    title="Last"
+  >
+    <MdLastPage size={18} />
+  </button>
+</div>
+
+When to use
+Record navigators (First / Prev / Next / Last)
+Icon-only action buttons where text label would be redundant
+Close (×) buttons inside panel headers
+Any circular action icon that pairs with a title tooltip instead of visible text
+Do not use for
+Buttons that have visible text labels → use lve-btn lve-btn-secondary lve-btn-sm instead
+Primary CTA actions → use lve-btn (blue fill) without !rounded-full
+
+Scroll to latest

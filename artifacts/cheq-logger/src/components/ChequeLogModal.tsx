@@ -151,8 +151,8 @@ export default function ChequeLogModal({ open, onClose }: Props) {
   };
 
   const position = cheques.length > 0
-    ? `${isNew ? "New" : currentIndex + 1} / ${cheques.length}`
-    : "0 / 0";
+    ? `${isNew ? "New" : currentIndex + 1} of ${cheques.length}`
+    : "0 of 0";
 
   const LBL = "block font-['Livvic'] font-semibold text-[#002f5c] text-[13px] mb-1";
   const INPUT = "h-9 font-['Mulish'] text-[13px] border-[#BBBBBB] rounded-[6px] focus-visible:ring-[#006cf4]/40";
@@ -169,34 +169,31 @@ export default function ChequeLogModal({ open, onClose }: Props) {
         </div>
 
         {/* Toolbar strip */}
-        <div className="bg-[#f5f7fa] border-b border-[#BBBBBB] px-4 py-1.5 flex items-center gap-1">
-          <Button variant="ghost" size="icon"
-            className="h-8 w-8 text-[#00263e] hover:bg-[#00263e]/10"
-            onClick={handleNew} title="New">
+        <div className="bg-[#f5f7fa] border-b border-[#BBBBBB] px-4 py-2 flex items-center gap-2">
+          <button type="button" onClick={handleNew} title="New"
+            className="lve-btn lve-btn-secondary !rounded-full !p-0 !w-8 !h-8 shrink-0">
             <MdNoteAdd size={18} />
-          </Button>
+          </button>
           <div className="w-px h-5 bg-[#BBBBBB] mx-1" />
-          <Button variant="ghost" size="icon"
-            className="h-8 w-8 text-[#00263e] hover:bg-[#00263e]/10"
-            onClick={handleFirst} disabled={!cheques.length} title="First">
+          <button type="button" onClick={handleFirst} disabled={!cheques.length} title="First"
+            className="lve-btn lve-btn-secondary !rounded-full !p-0 !w-8 !h-8 shrink-0">
             <MdSkipPrevious size={18} />
-          </Button>
-          <Button variant="ghost" size="icon"
-            className="h-8 w-8 text-[#00263e] hover:bg-[#00263e]/10"
-            onClick={handlePrev} disabled={!cheques.length || currentIndex === 0} title="Previous">
+          </button>
+          <button type="button" onClick={handlePrev} disabled={!cheques.length || currentIndex === 0} title="Previous"
+            className="lve-btn lve-btn-secondary !rounded-full !p-0 !w-8 !h-8 shrink-0">
             <MdNavigateBefore size={18} />
-          </Button>
-          <Button variant="ghost" size="icon"
-            className="h-8 w-8 text-[#00263e] hover:bg-[#00263e]/10"
-            onClick={handleNext} disabled={!cheques.length || currentIndex >= cheques.length - 1} title="Next">
+          </button>
+          <span className="text-[13px] font-['Mulish'] font-bold text-[#4a4a49] px-2 min-w-[64px] text-center select-none">
+            {position}
+          </span>
+          <button type="button" onClick={handleNext} disabled={!cheques.length || currentIndex >= cheques.length - 1} title="Next"
+            className="lve-btn lve-btn-secondary !rounded-full !p-0 !w-8 !h-8 shrink-0">
             <MdNavigateNext size={18} />
-          </Button>
-          <Button variant="ghost" size="icon"
-            className="h-8 w-8 text-[#00263e] hover:bg-[#00263e]/10"
-            onClick={handleLast} disabled={!cheques.length} title="Last">
+          </button>
+          <button type="button" onClick={handleLast} disabled={!cheques.length} title="Last"
+            className="lve-btn lve-btn-secondary !rounded-full !p-0 !w-8 !h-8 shrink-0">
             <MdSkipNext size={18} />
-          </Button>
-          <span className="ml-auto font-['Mulish'] text-[#00263e]/50 text-[12px]">{position}</span>
+          </button>
         </div>
 
         {/* Form body */}

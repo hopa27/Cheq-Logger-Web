@@ -202,4 +202,31 @@ html {
   .day-outside-hatch {
     background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, #e7ebec 5px, #e7ebec 10px);
   }
+
+  .lve-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Livvic', sans-serif;
+    font-weight: 600;
+    border: 1.5px solid transparent;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+    outline: none;
+  }
+  .lve-btn:disabled {
+    opacity: 0.35;
+    pointer-events: none;
+  }
+  .lve-btn-secondary {
+    background-color: #ffffff;
+    border-color: #006cf4;
+    color: #006cf4;
+  }
+  .lve-btn-secondary:hover {
+    background-color: #eaf5f8;
+    border-color: #006cf4;
+    color: #006cf4;
+  }
 }
