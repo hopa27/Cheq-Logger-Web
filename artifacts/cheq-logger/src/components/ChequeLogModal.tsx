@@ -298,19 +298,6 @@ export default function ChequeLogModal({ open, onClose }: Props) {
             </div>
           </div>
 
-          <div>
-            <label className={LBL}>Status</label>
-            <Select value={form.status} onValueChange={set("status")}>
-              <SelectTrigger className={INPUT}>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="outstanding">Outstanding</SelectItem>
-                <SelectItem value="cleared">Cleared</SelectItem>
-                <SelectItem value="cancelled">Cancelled</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
         </div>
 
         {/* Footer */}
