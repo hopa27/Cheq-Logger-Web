@@ -20,7 +20,7 @@ export function DatePicker({ value, onChange, disabled, isError, placeholder, cl
   const [open, setOpen] = React.useState(false);
   const dateValue = value ? new Date(value) : undefined;
   
-  const displayValue = dateValue ? format(dateValue, "dd, MMM, yyyy") : "";
+  const displayValue = dateValue ? format(dateValue, "dd/MM/yyyy") : "";
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
