@@ -10,9 +10,20 @@ import {
 } from "react-icons/md";
 
 const EXPORT_FORMATS = [
-  { value: "pdf",  label: "Acrobat Format (PDF)" },
-  { value: "html", label: "HTML Document" },
-  { value: "csv",  label: "CSV File" },
+  { value: "pdf",          label: "Acrobat Format (PDF)" },
+  { value: "rpt",          label: "Crystal Reports (RPT)",               disabled: true },
+  { value: "html32",       label: "HTML 3.2" },
+  { value: "html40",       label: "HTML 4.0" },
+  { value: "xls",          label: "MS Excel 97-2000" },
+  { value: "xls-data",     label: "MS Excel 97-2000 (Data only)" },
+  { value: "doc",          label: "MS Word" },
+  { value: "odbc",         label: "ODBC",                                disabled: true },
+  { value: "rec-nospace",  label: "Record style (columns no spaces)" },
+  { value: "rec-space",    label: "Record style (columns with spaces)" },
+  { value: "rdef",         label: "Report Definition",                   disabled: true },
+  { value: "rtf",          label: "Rich Text Format" },
+  { value: "csv",          label: "Separated Values (CSV)" },
+  { value: "tsv",          label: "Tab-separated text" },
 ];
 
 function ExportDialog({
@@ -49,7 +60,7 @@ function ExportDialog({
               className="h-[44px] w-full font-['Mulish'] text-[13px] text-[#3d3d3d] border border-[#BBBBBB] rounded-[6px] px-3 bg-white focus:outline-none focus:border-[#006cf4] cursor-pointer"
             >
               {EXPORT_FORMATS.map(f => (
-                <option key={f.value} value={f.value}>{f.label}</option>
+                <option key={f.value} value={f.value} disabled={f.disabled}>{f.label}</option>
               ))}
             </select>
           </div>
@@ -272,41 +283,100 @@ export default function AccountsReportModal({ open, onClose }: Props) {
   const handleExportOk = async (fmt: string) => {
     setExportOpen(false);
     const el = printRef.current;
+    const base = `accounts-report-${startDate}-${endDate}`;
 
-    if (fmt === "pdf") {
-      // Open print dialog — user selects "Save as PDF" in their print dialog
+    const printHtml = (title: string, style: string) => {
       if (!el) return;
       const w = window.open("", "_blank", "width=960,height=650");
       if (!w) return;
-      w.document.write(`<html><head><title>Accounts Report</title>
-        <style>
-          @page { size: A4 portrait; margin: 20mm 15mm; }
-          body { font-family: Arial, sans-serif; font-size: 9px; color: #000; }
-          h2 { text-align: center; font-size: 12px; margin-bottom: 12px; }
-          .grid { display: grid; grid-template-columns: 72px 72px 104px 128px 60px 64px 72px 52px 74px; }
-          .th { font-weight: bold; border-bottom: 1px solid #000; padding-bottom: 2px; font-size: 8.5px; padding-right: 6px; }
-          .td { font-size: 8.5px; padding: 1px 6px 1px 0; }
-        </style></head><body>${el.innerHTML}</body></html>`);
+      w.document.write(`<html><head><title>${title}</title><style>${style}</style></head><body>${el.innerHTML}</body></html>`);
       w.document.close(); w.focus(); w.print();
-      return;
-    }
+    };
 
-    if (fmt === "html") {
-      if (!el) return;
-      const html = `<html><head><title>Accounts Report</title></head><body>${el.innerHTML}</body></html>`;
-      const blob = new Blob([html], { type: "text/html" });
-      download(blob, `accounts-report-${startDate}-${endDate}.html`);
-      return;
-    }
+    const PAGE_STYLE = `
+      @page { size: A4 portrait; margin: 20mm 15mm; }
+      body { font-family: Arial, sans-serif; font-size: 9px; color: #000; }
+      h2 { text-align: center; font-size: 12px; margin-bottom: 12px; }
+      .grid { display: grid; grid-template-columns: 72px 72px 104px 128px 60px 64px 72px 52px 74px; }
+      .th { font-weight: bold; border-bottom: 1px solid #000; padding-bottom: 2px; font-size: 8.5px; padding-right: 6px; }
+      .td { font-size: 8.5px; padding: 1px 6px 1px 0; }
+    `;
 
-    if (fmt === "csv") {
-      const headers = ["Ref", "Date Rec'd", "Drawer", "Policy Name/Cheque Details", "Policy No", "Amount", "Department", "Payin Slip No", "Signed Posted"];
-      const rows = DUMMY_ROWS.map(r =>
-        [r.ref, r.date, `"${r.drawer}"`, `"${r.policyName}"`, r.policyNo, r.amount, r.department, r.payinSlip, r.signedPosted].join(",")
-      );
-      const csv = [headers.join(","), ...rows].join("\r\n");
-      const blob = new Blob([csv], { type: "text/csv" });
-      download(blob, `accounts-report-${startDate}-${endDate}.csv`);
+    const csvRow = (r: typeof DUMMY_ROWS[0], sep: string, pad?: number) => {
+      const cols = [r.ref, r.date, r.drawer, r.policyName, r.policyNo, r.amount, r.department, r.payinSlip, r.signedPosted];
+      if (pad) return cols.map(v => (v ?? "").padEnd(pad)).join(sep);
+      return cols.map(v => (sep === "," ? `"${(v ?? "").replace(/"/g, '""')}"` : (v ?? ""))).join(sep);
+    };
+
+    const HEADERS = ["Ref", "Date Rec'd", "Drawer", "Policy Name/Cheque Details", "Policy No", "Amount", "Department", "Payin Slip No", "Signed Posted"];
+
+    switch (fmt) {
+      case "pdf":
+        printHtml("Accounts Report", PAGE_STYLE);
+        break;
+
+      case "html32":
+      case "html40": {
+        if (!el) break;
+        const doctype = fmt === "html32" ? "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.2//EN\">" : "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\">";
+        const html = `${doctype}\n<html><head><title>Accounts Report</title></head><body>${el.innerHTML}</body></html>`;
+        download(new Blob([html], { type: "text/html" }), `${base}.html`);
+        break;
+      }
+
+      case "xls":
+      case "xls-data": {
+        const rows = fmt === "xls-data" ? DUMMY_ROWS : DUMMY_ROWS;
+        const tableRows = rows.map(r =>
+          `<tr>${[r.ref, r.date, r.drawer, r.policyName, r.policyNo, r.amount, r.department, r.payinSlip, r.signedPosted]
+            .map(v => `<td>${v ?? ""}</td>`).join("")}</tr>`
+        ).join("\n");
+        const headerRow = fmt === "xls" ? `<tr>${HEADERS.map(h => `<th>${h}</th>`).join("")}</tr>\n` : "";
+        const xls = `<html><head><meta charset="UTF-8"><style>table{border-collapse:collapse}td,th{border:1px solid #ccc;padding:3px 6px;font-size:9pt}</style></head><body><table>${headerRow}${tableRows}</table></body></html>`;
+        download(new Blob([xls], { type: "application/vnd.ms-excel" }), `${base}.xls`);
+        break;
+      }
+
+      case "doc": {
+        if (!el) break;
+        const doc = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="UTF-8"><title>Accounts Report</title></head><body>${el.innerHTML}</body></html>`;
+        download(new Blob([doc], { type: "application/msword" }), `${base}.doc`);
+        break;
+      }
+
+      case "rec-nospace": {
+        const lines = [HEADERS.map(h => h.replace(/\s/g, "")).join(" "), ...DUMMY_ROWS.map(r => csvRow(r, " "))];
+        download(new Blob([lines.join("\r\n")], { type: "text/plain" }), `${base}.txt`);
+        break;
+      }
+
+      case "rec-space": {
+        const lines = [HEADERS.join(" "), ...DUMMY_ROWS.map(r => csvRow(r, " ", 20))];
+        download(new Blob([lines.join("\r\n")], { type: "text/plain" }), `${base}.txt`);
+        break;
+      }
+
+      case "rtf": {
+        const rtfRows = DUMMY_ROWS.map(r =>
+          [r.ref, r.date, r.drawer, r.policyName, r.policyNo, r.amount, r.department, r.payinSlip, r.signedPosted]
+            .map(v => `\\pard\\intbl ${v ?? ""}\\cell`).join("") + "\\row"
+        ).join("\n");
+        const rtf = `{\\rtf1\\ansi{\\fonttbl{\\f0 Arial;}}\\f0\\fs18\n{\\b Accounts Report}\\par\\par\n{\\trowd${rtfRows}\\pard}\\par}`;
+        download(new Blob([rtf], { type: "application/rtf" }), `${base}.rtf`);
+        break;
+      }
+
+      case "csv": {
+        const lines = [HEADERS.map(h => `"${h}"`).join(","), ...DUMMY_ROWS.map(r => csvRow(r, ","))];
+        download(new Blob([lines.join("\r\n")], { type: "text/csv" }), `${base}.csv`);
+        break;
+      }
+
+      case "tsv": {
+        const lines = [HEADERS.join("\t"), ...DUMMY_ROWS.map(r => csvRow(r, "\t"))];
+        download(new Blob([lines.join("\r\n")], { type: "text/tab-separated-values" }), `${base}.tsv`);
+        break;
+      }
     }
   };
 
