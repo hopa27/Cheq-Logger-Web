@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { format } from "date-fns";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { useDateRange } from "@/lib/date-context";
 import {
   MdClose, MdPrint, MdSave,
@@ -21,29 +22,31 @@ function ExportDialog({
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center">
-      {/* backdrop — does not close (legacy behaviour) */}
-      <div className="absolute inset-0 bg-black/40" />
-      <div className="relative bg-[#f0f0f0] border-2 border-[#8a8a8a] shadow-2xl w-[340px]" style={{ fontFamily: "Mulish, Arial, sans-serif" }}>
-        {/* Title bar */}
-        <div className="bg-[#00263e] px-3 py-[5px] flex items-center justify-between">
-          <span className="text-white text-[13px] font-semibold select-none">Export</span>
+      <div className="absolute inset-0 bg-black/50" />
+      <div className="relative bg-white rounded-[8px] overflow-hidden border border-[#BBBBBB] shadow-2xl w-[400px]">
+        {/* LV header */}
+        <div className="bg-[#00263e] px-5 py-3 flex items-center justify-between">
+          <span className="font-['Livvic'] text-white text-[16px] font-semibold">Export</span>
           <button
             type="button"
             onClick={onCancel}
-            className="text-white text-[14px] w-5 h-5 flex items-center justify-center hover:bg-white/20 rounded-sm focus:outline-none"
+            className="lve-btn lve-btn-secondary !rounded-full !p-0 !w-7 !h-7 shrink-0"
             aria-label="Close"
           >
-            <MdClose size={14} />
+            <MdClose size={16} />
           </button>
         </div>
+
         {/* Body */}
-        <div className="px-4 pt-4 pb-3 space-y-3">
+        <div className="bg-white px-5 py-5 space-y-4">
           <div>
-            <label className="block text-[12px] text-[#3d3d3d] mb-1 font-semibold">Format:</label>
+            <label className="block font-['Livvic'] font-semibold text-[#002f5c] text-[13px] mb-1">
+              Format:
+            </label>
             <select
               value={fmt}
               onChange={e => setFmt(e.target.value)}
-              className="w-full border border-[#8a8a8a] bg-white text-[12px] text-[#3d3d3d] px-2 h-[26px] focus:outline-none focus:border-[#006cf4] cursor-pointer"
+              className="h-[44px] w-full font-['Mulish'] text-[13px] text-[#3d3d3d] border border-[#BBBBBB] rounded-[6px] px-3 bg-white focus:outline-none focus:border-[#006cf4] cursor-pointer"
             >
               {EXPORT_FORMATS.map(f => (
                 <option key={f.value} value={f.value}>{f.label}</option>
@@ -51,28 +54,23 @@ function ExportDialog({
             </select>
           </div>
           <div>
-            <label className="block text-[12px] text-[#3d3d3d] mb-1 font-semibold">Destination:</label>
-            <div className="w-full border border-[#8a8a8a] bg-white text-[12px] text-[#3d3d3d] px-2 h-[26px] flex items-center select-none">
+            <label className="block font-['Livvic'] font-semibold text-[#002f5c] text-[13px] mb-1">
+              Destination:
+            </label>
+            <div className="h-[44px] w-full font-['Mulish'] text-[13px] text-[#3d3d3d] border border-[#BBBBBB] rounded-[6px] px-3 bg-[#f5f7fa] flex items-center select-none">
               Disk file
             </div>
           </div>
         </div>
-        {/* Buttons */}
-        <div className="flex gap-2 justify-end px-4 pb-4">
-          <button
-            type="button"
-            onClick={() => onOk(fmt)}
-            className="bg-[#00263e] text-white text-[12px] font-semibold px-6 h-[26px] border border-[#00263e] hover:bg-[#004080] focus:outline-none"
-          >
-            OK
-          </button>
-          <button
-            type="button"
-            onClick={onCancel}
-            className="bg-[#f0f0f0] text-[#3d3d3d] text-[12px] font-semibold px-4 h-[26px] border border-[#8a8a8a] hover:bg-[#e0e0e0] focus:outline-none"
-          >
+
+        {/* LV footer */}
+        <div className="bg-[#f5f7fa] border-t border-[#BBBBBB] px-5 py-3 flex justify-end gap-2">
+          <Button variant="secondary" size="sm" onClick={onCancel}>
             Cancel
-          </button>
+          </Button>
+          <Button size="sm" onClick={() => onOk(fmt)}>
+            OK
+          </Button>
         </div>
       </div>
     </div>
