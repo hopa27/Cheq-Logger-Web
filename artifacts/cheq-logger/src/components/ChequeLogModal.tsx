@@ -79,6 +79,7 @@ export default function ChequeLogModal({ open, onClose }: Props) {
   const updateCheque = useUpdateCheque();
 
   const [isNew, setIsNew] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [form, setForm] = useState<FormState>(emptyForm());
   const [signedBy, setSignedBy] = useState<string>("");
@@ -104,6 +105,7 @@ export default function ChequeLogModal({ open, onClose }: Props) {
     });
     setSignedBy(c.signedBy ?? "");
     setIsNew(false);
+    setIsEditing(false);
     setCurrentIndex(index);
   }, [cheques]);
 
@@ -132,6 +134,20 @@ export default function ChequeLogModal({ open, onClose }: Props) {
     setPendingLogRef(next);
     setForm(emptyForm());
     setIsNew(true);
+    setIsEditing(true);
+  };
+
+  const handleEdit = () => setIsEditing(true);
+
+  const handleCancel = () => {
+    if (isNew) {
+      // discard new form — jump back to last saved cheque
+      if (cheques.length > 0) loadCheque(cheques.length - 1);
+      else { setIsNew(false); setIsEditing(false); setForm(emptyForm()); }
+    } else {
+      // revert edits
+      loadCheque(currentIndex);
+    }
   };
   const handleFirst = () => loadCheque(0);
   const handlePrev = () => loadCheque(Math.max(0, currentIndex - 1));
@@ -181,6 +197,7 @@ export default function ChequeLogModal({ open, onClose }: Props) {
       queryClient.invalidateQueries({ queryKey: getListChequesQueryKey() });
       queryClient.invalidateQueries({ queryKey: getGetDashboardSummaryQueryKey() });
       setIsNew(false);
+      setIsEditing(false);
     } catch {
       toast({ title: "Error saving cheque", variant: "destructive" });
     }
@@ -190,8 +207,10 @@ export default function ChequeLogModal({ open, onClose }: Props) {
     ? `${isNew ? "New" : currentIndex + 1} of ${cheques.length}`
     : "0 of 0";
 
+  const ro = !isEditing && !isNew;
   const LBL = "block font-['Livvic'] font-semibold text-[#002f5c] text-[13px] mb-1";
   const INPUT = "h-[44px] font-['Mulish'] text-[13px] border-[#BBBBBB] rounded-[6px] focus-visible:ring-[#006cf4]/40";
+  const INPUT_RO = INPUT + " bg-[#f5f7fa] cursor-default select-text";
 
   return (
     <Dialog open={open} onOpenChange={v => !v && onClose()}>
@@ -258,7 +277,8 @@ export default function ChequeLogModal({ open, onClose }: Props) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className={LBL}>Date Rec'd</label>
-              <DatePicker value={form.issueDate} onChange={val => set("issueDate")(val)} inputClassName={INPUT} />
+              <DatePicker value={form.issueDate} onChange={val => set("issueDate")(val)}
+                inputClassName={ro ? INPUT_RO : INPUT} disabled={ro} />
             </div>
             <div>
               <label className={LBL}>Signed / Posted</label>
@@ -273,7 +293,8 @@ export default function ChequeLogModal({ open, onClose }: Props) {
                   type="button"
                   onClick={() => setSignedBy(signedBy ? "" : "UAT3")}
                   title={signedBy ? "Unsign" : "Sign"}
-                  className="lve-btn lve-btn-secondary shrink-0 !h-[44px] !w-[44px] !rounded-[6px] !p-0 flex items-center justify-center"
+                  disabled={ro}
+                  className="lve-btn lve-btn-secondary shrink-0 !h-[44px] !w-[44px] !rounded-[6px] !p-0 flex items-center justify-center disabled:opacity-40 disabled:cursor-default"
                 >
                   {signedBy ? <MdEditOff size={18} /> : <MdEdit size={18} />}
                 </button>
@@ -284,13 +305,14 @@ export default function ChequeLogModal({ open, onClose }: Props) {
           <div className="grid grid-cols-3 gap-4">
             <div>
               <label className={LBL}>Pay-in Slip No</label>
-              <Input className={INPUT} value={form.chequeNumber}
+              <Input className={ro ? INPUT_RO : INPUT} value={form.chequeNumber}
+                readOnly={ro}
                 onChange={e => set("chequeNumber")(e.target.value)} placeholder="CHQ-001" />
             </div>
             <div>
               <label className={LBL}>Department</label>
-              <Select value={form.departmentId} onValueChange={set("departmentId")}>
-                <SelectTrigger className={INPUT}>
+              <Select value={form.departmentId} onValueChange={set("departmentId")} disabled={ro}>
+                <SelectTrigger className={ro ? INPUT_RO : INPUT}>
                   <SelectValue placeholder="Select..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -302,8 +324,8 @@ export default function ChequeLogModal({ open, onClose }: Props) {
             </div>
             <div>
               <label className={LBL}>Account Credited</label>
-              <Select value={form.accountId} onValueChange={set("accountId")}>
-                <SelectTrigger className={INPUT}>
+              <Select value={form.accountId} onValueChange={set("accountId")} disabled={ro}>
+                <SelectTrigger className={ro ? INPUT_RO : INPUT}>
                   <SelectValue placeholder="Select..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -318,34 +340,40 @@ export default function ChequeLogModal({ open, onClose }: Props) {
           <div>
             <div className="flex items-center gap-2 mb-1">
               <label className={LBL + " !mb-0"}>Drawer</label>
-              <button
-                type="button"
-                onClick={() => set("payee")("LV=")}
-                className="lve-btn lve-btn-secondary !h-[22px] !px-2 !text-[11px] !font-['Livvic'] !font-bold shrink-0"
-              >
-                LV=
-              </button>
+              {!ro && (
+                <button
+                  type="button"
+                  onClick={() => set("payee")("LV=")}
+                  className="lve-btn lve-btn-secondary !h-[22px] !px-2 !text-[11px] !font-['Livvic'] !font-bold shrink-0"
+                >
+                  LV=
+                </button>
+              )}
             </div>
-            <Input className={INPUT} value={form.payee}
+            <Input className={ro ? INPUT_RO : INPUT} value={form.payee}
+              readOnly={ro}
               onChange={e => set("payee")(e.target.value)} placeholder="Payee / drawer name" />
           </div>
 
           <div>
             <label className={LBL}>Policy Name / Cheque Details</label>
-            <Input className={INPUT} value={form.notes}
+            <Input className={ro ? INPUT_RO : INPUT} value={form.notes}
+              readOnly={ro}
               onChange={e => set("notes")(e.target.value)} placeholder="Notes or cheque description" />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className={LBL}>Policy Ref</label>
-              <Input className={INPUT} value={form.policyRef}
+              <Input className={ro ? INPUT_RO : INPUT} value={form.policyRef}
+                readOnly={ro}
                 onChange={e => set("policyRef")(e.target.value)} placeholder="e.g. 100030" />
             </div>
             <div>
               <label className={LBL}>Cheque Amount</label>
-              <Input className={INPUT + " font-bold text-[#d72714]"}
+              <Input className={(ro ? INPUT_RO : INPUT) + " font-bold text-[#d72714]"}
                 type="number" step="0.01"
+                readOnly={ro}
                 value={form.amount}
                 onChange={e => set("amount")(e.target.value)}
                 placeholder="0.00" />
@@ -356,9 +384,15 @@ export default function ChequeLogModal({ open, onClose }: Props) {
 
         {/* Footer */}
         <div className="bg-[#f5f7fa] border-t border-[#BBBBBB] px-5 py-3 flex justify-end gap-2">
-          <Button variant="secondary" size="sm" onClick={onClose}>
-            Close
-          </Button>
+          {ro ? (
+            <Button size="sm" className="lve-btn" onClick={handleEdit}>Edit</Button>
+          ) : (
+            <>
+              <Button size="sm" className="lve-btn" onClick={handleSave}>Save</Button>
+              <Button variant="secondary" size="sm" onClick={handleCancel}>Cancel</Button>
+            </>
+          )}
+          <Button variant="secondary" size="sm" onClick={onClose}>Close</Button>
         </div>
 
       </DialogContent>
