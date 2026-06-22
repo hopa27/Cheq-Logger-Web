@@ -82,6 +82,8 @@ export default function ChequeLogModal({ open, onClose }: Props) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [form, setForm] = useState<FormState>(emptyForm());
   const [signedBy, setSignedBy] = useState<string>("");
+  const [pendingLogRef, setPendingLogRef] = useState("");
+  const wantLastRef = React.useRef(false);
 
   const currentCheque = !isNew && cheques.length > 0 ? cheques[currentIndex] : null;
 
@@ -109,6 +111,14 @@ export default function ChequeLogModal({ open, onClose }: Props) {
     if (open && cheques.length > 0 && !isNew) loadCheque(0);
   }, [open, cheques.length]);
 
+  // After a create, navigate to the newly appended last cheque
+  useEffect(() => {
+    if (wantLastRef.current && cheques.length > 0) {
+      wantLastRef.current = false;
+      loadCheque(cheques.length - 1);
+    }
+  }, [cheques]);
+
   // Auto-select account 843 whenever the field is blank and accounts are loaded
   useEffect(() => {
     if (!form.accountId && accounts.length > 0) {
@@ -117,7 +127,12 @@ export default function ChequeLogModal({ open, onClose }: Props) {
     }
   }, [accounts, form.accountId]);
 
-  const handleNew = () => { setForm(emptyForm()); setIsNew(true); };
+  const handleNew = () => {
+    const next = String(Math.max(31000000, ...cheques.map(c => parseInt(c.logRef, 10) || 0)) + 1);
+    setPendingLogRef(next);
+    setForm(emptyForm());
+    setIsNew(true);
+  };
   const handleFirst = () => loadCheque(0);
   const handlePrev = () => loadCheque(Math.max(0, currentIndex - 1));
   const handleNext = () => loadCheque(Math.min(cheques.length - 1, currentIndex + 1));
@@ -141,7 +156,7 @@ export default function ChequeLogModal({ open, onClose }: Props) {
       return;
     }
     const data = {
-      logRef: isNew ? "" : (currentCheque?.logRef ?? ""),
+      logRef: isNew ? pendingLogRef : (currentCheque?.logRef ?? ""),
       chequeNumber: form.chequeNumber,
       issueDate: form.issueDate,
       signedBy: signedBy || null,
@@ -158,6 +173,7 @@ export default function ChequeLogModal({ open, onClose }: Props) {
       if (isNew) {
         await createCheque.mutateAsync({ data });
         toast({ title: "Cheque created" });
+        wantLastRef.current = true;
       } else if (currentCheque) {
         await updateCheque.mutateAsync({ id: currentCheque.id, data });
         toast({ title: "Cheque updated" });
@@ -199,7 +215,7 @@ export default function ChequeLogModal({ open, onClose }: Props) {
         <div className="bg-[#f5f7fa] border-b border-[#BBBBBB] px-4 py-2 flex items-center gap-2">
           {/* Log ref badge — no label, left-anchored */}
           <span className="font-['Mulish'] text-[13px] font-bold text-[#00263e] bg-white border border-[#BBBBBB] rounded-[6px] px-3 h-8 flex items-center min-w-[80px] select-none">
-            {isNew ? <span className="text-[#999]">New</span> : (currentCheque?.logRef || <span className="text-[#999]">—</span>)}
+            {isNew ? pendingLogRef : (currentCheque?.logRef || <span className="text-[#999]">—</span>)}
           </span>
           <div className="flex-1" />
           <button type="button" onClick={handleNew} title="New"

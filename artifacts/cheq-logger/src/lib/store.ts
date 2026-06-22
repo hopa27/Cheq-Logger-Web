@@ -198,7 +198,7 @@ export function listCheques(filters: ChequeFilters): Cheque[] {
         : true
     )
     .map((c) => enrich(db, c))
-    .sort((a, b) => (a.issueDate < b.issueDate ? 1 : a.issueDate > b.issueDate ? -1 : 0));
+    .sort((a, b) => (parseInt(a.logRef, 10) || 0) - (parseInt(b.logRef, 10) || 0));
 }
 
 export function getCheque(id: number): Cheque | undefined {
