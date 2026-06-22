@@ -32,14 +32,12 @@ export default function Header({ title }: { title?: string }) {
             </>
           )}
         </div>
-        {location !== '/' && (
-          <button
-            onClick={() => setLocation("/")}
-            className="text-white/70 hover:text-white text-sm font-['Mulish'] transition-colors flex-shrink-0"
-          >
-            Back to Menu
-          </button>
-        )}
+        <button
+          onClick={() => { localStorage.clear(); window.location.reload(); }}
+          className="text-white/70 hover:text-white text-sm font-['Mulish'] transition-colors flex-shrink-0 border border-white/30 hover:border-white/60 rounded-[30px] px-4 py-1.5"
+        >
+          Logout
+        </button>
       </div>
     </header>
   );
