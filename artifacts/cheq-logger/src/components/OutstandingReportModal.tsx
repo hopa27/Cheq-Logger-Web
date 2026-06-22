@@ -113,7 +113,7 @@ const PAGE_2_ROWS = DUMMY_ROWS.slice(34);
 const COL_WIDTHS = "grid-cols-[72px_72px_104px_128px_60px_64px_72px_52px_74px]";
 
 function TableHead() {
-  const thCls = "text-left font-['Mulish'] font-bold text-[9.5px] text-[#3d3d3d] border-b border-[#3d3d3d] pb-[3px] whitespace-nowrap pr-2";
+  const thCls = "text-left font-['Mulish'] font-bold text-[9.5px] text-[#3d3d3d] border-b border-[#3d3d3d] pb-[3px] leading-tight pr-2";
   return (
     <div className={`grid ${COL_WIDTHS} mb-[1px]`}>
       <span className={thCls}>Ref</span>
