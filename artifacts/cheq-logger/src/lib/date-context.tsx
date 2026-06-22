@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, ReactNode } from "react";
-import { startOfMonth, endOfMonth, format } from "date-fns";
 
 interface DateRangeContextType {
   startDate: string;
@@ -11,8 +10,8 @@ interface DateRangeContextType {
 const DateRangeContext = createContext<DateRangeContextType | undefined>(undefined);
 
 export function DateRangeProvider({ children }: { children: ReactNode }) {
-  const [startDate, setStartDate] = useState(() => format(startOfMonth(new Date()), "yyyy-MM-dd"));
-  const [endDate, setEndDate] = useState(() => format(endOfMonth(new Date()), "yyyy-MM-dd"));
+  const [startDate, setStartDate] = useState("2025-12-03");
+  const [endDate, setEndDate] = useState("2026-06-12");
 
   return (
     <DateRangeContext.Provider value={{ startDate, endDate, setStartDate, setEndDate }}>
