@@ -167,17 +167,13 @@ export default function ChequeLogModal({ open, onClose }: Props) {
     setForm(f => ({ ...f, [field]: val }));
 
   const handleSave = async () => {
-    if (!form.accountId || !form.departmentId || !form.chequeNumber || !form.amount) {
-      toast({ title: "Required fields missing", description: "Fill in all required fields.", variant: "destructive" });
-      return;
-    }
     const data = {
       logRef: isNew ? pendingLogRef : (currentCheque?.logRef ?? ""),
       chequeNumber: form.chequeNumber,
       issueDate: form.issueDate,
       signedBy: signedBy || null,
-      accountId: Number(form.accountId),
-      departmentId: Number(form.departmentId),
+      accountId: Number(form.accountId) || 0,
+      departmentId: Number(form.departmentId) || 0,
       payee: form.payee,
       notes: form.notes || null,
       policyRef: form.policyRef || null,
