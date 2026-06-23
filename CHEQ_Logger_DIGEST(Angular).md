@@ -18,7 +18,7 @@
 | Data store   | `localStorage` key `cheq_logger_db_v5`; seeded on first load with 2 accounts, 12 departments, 8 cheques                                                              |
 | Auth         | No server auth — demo gate; user is always `Demo User / admin`; `canEdit` and `canManage` are always `true`                                                          |
 | Build        | Vite (`@vitejs/plugin-react`, `@tailwindcss/vite`) → static `dist/public/` output; reads `PORT` and `BASE_PATH` environment variables at startup                    |
-| Date context | Global `DateRangeContext` (default start `2025-12-03`, end `2026-06-12`) — drives both the Dashboard pickers and the Accounts report range                           |
+| Date context | Global `DateRangeContext` (both dates default to **empty `""`**) — drives both the Dashboard pickers and the Accounts report range; Accounts button validates before opening |
 
 ### Fonts
 
@@ -106,17 +106,17 @@ Wraps every route. Renders `<Header>` → `<main>` (flex-1 bg-background) → `<
 ```yaml
 provider: DateRangeProvider
 defaults:
-  startDate: "2025-12-03"
-  endDate:   "2026-06-12"
+  startDate: ""   # empty — picker shows DD/MM/YYYY placeholder
+  endDate:   ""   # empty — picker shows DD/MM/YYYY placeholder
 hook: useDateRange()
 fields:
-  - startDate: string   // yyyy-MM-dd
-  - endDate:   string   // yyyy-MM-dd
+  - startDate: string   // yyyy-MM-dd, or "" when not yet set
+  - endDate:   string   // yyyy-MM-dd, or "" when not yet set
   - setStartDate: (date: string) => void
   - setEndDate:   (date: string) => void
 ```
 
-Used by both the Dashboard pickers and the `AccountsReportModal` to scope its report query.
+Used by both the Dashboard pickers and `AccountsReportModal` to scope its report query. Consumers that format dates (e.g. `fmtRangeLabel`) must guard against the empty-string case.
 
 ---
 
@@ -134,14 +134,36 @@ The card contains three sections in order:
 
 #### 3.1.1 Date Range pickers
 
-Two `DatePicker` components (see §4.1), stacked vertically. Both are two-way bound to the global `DateRangeContext`. Changing either value is reflected immediately in the Accounts report.
+Two `DatePicker` components (see §4.1), stacked vertically. Both are two-way bound to the global `DateRangeContext`. Both fields are **empty by default** — the picker renders the placeholder `DD/MM/YYYY` until the user selects a date. Changing either value is reflected immediately in the Accounts report.
 
 #### 3.1.2 Action buttons
 
-| Button       | Icon          | Variant   | Opens                  |
-| ------------ | ------------- | --------- | ---------------------- |
-| Accounts     | `MdPrint`     | secondary | `AccountsReportModal`  |
-| New / Amend  | `MdNoteAdd`   | secondary | `ChequeLogModal`       |
+| Button       | Icon          | Variant   | Behaviour |
+| ------------ | ------------- | --------- | --------- |
+| Accounts     | `MdPrint`     | secondary | Validates that both Start Date and End Date are non-empty; if either is missing, shows the **Date Error Dialog** (§3.1.3); otherwise opens `AccountsReportModal` |
+| New / Amend  | `MdNoteAdd`   | secondary | Opens `ChequeLogModal` (no date validation required) |
+
+#### 3.1.3 Date Error Dialog
+
+Triggered when **Accounts** is clicked while either date field is empty.
+
+```yaml
+title_bar:
+  background: "#00263e"
+  label: "Error"
+body:
+  icon: "red circle (#d72714) with white ✕"
+  message: "Missing or invalid date range!"
+  font: "Mulish 14px, color #1a1a1a"
+footer:
+  background: "#f5f7fa"
+  border: "border-t border-[#BBBBBB]"
+  buttons:
+    - label: "OK"
+      variant: primary
+      position: center
+      action: "close dialog; user returns to Menu to fill date fields"
+```
 
 Both buttons span full width with left-aligned icon+label (`justify-start`).
 

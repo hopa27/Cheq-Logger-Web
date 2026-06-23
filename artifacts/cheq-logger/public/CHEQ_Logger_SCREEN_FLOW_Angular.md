@@ -62,13 +62,46 @@ The only page in the app. All features open as modals from here.
 +---------------------------------------------+
 ```
 
+- Both dates default to **empty** on first load (placeholder `DD/MM/YYYY`).
 - Both dates persist via a shared context and filter all modals immediately.
 - Clicking `📅` opens the **Date Picker Popover** (see §5).
 
+**Accounts button — validation guard:**
+
 ```
-[ Accounts    ]  >>>  §4 AccountsReportModal
+[ Accounts ] clicked
+       |
+       +-- Start Date OR End Date is empty?
+       |          YES  →  Date Error Dialog (see §2A)
+       |          NO   →  open AccountsReportModal (see §4)
+```
+
+```
+[ Accounts    ]  >>>  §4 AccountsReportModal  (only when both dates are filled)
 [ New / Amend ]  >>>  §3 ChequeLogModal
 ```
+
+### 2A. Date Error Dialog
+
+Shown when **Accounts** is clicked with either date field empty.
+
+```
++------------------------------------------+
+| Error                          [ × ]      |
++------------------------------------------+
+|  [ X ]  Missing or invalid date range!   |
++------------------------------------------+
+|                   [ OK ]                 |
++------------------------------------------+
+```
+
+| Element | Detail |
+|---------|--------|
+| Title bar | Navy `#00263e`, label "Error" |
+| Icon | Red circle `#d72714` with white ✕ |
+| Message | "Missing or invalid date range!" (Mulish 14px) |
+| OK button | Primary; closes dialog; returns focus to Menu |
+| Clicking outside | Not applicable — modal blocks interaction |
 
 ---
 
