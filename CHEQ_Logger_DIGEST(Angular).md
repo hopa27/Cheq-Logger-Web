@@ -249,13 +249,13 @@ The modal is structured in four vertical bands:
 | Field | Control | Notes |
 | ----- | ------- | ----- |
 | Date Rec'd | `DatePicker` | `yyyy-MM-dd` stored; editable in edit/new mode |
-| Signed / Posted | Read-only `Input` + **Sign / Unsign** icon button | Toggle: empty → `"UAT3"` → empty; button shows `MdEdit` (sign) or `MdEditOff` (unsign) |
+| Signed / Posted | Read-only `Input` + **Sign** icon button | **One-way only.** Not signed → click → sets `signedBy = "UAT3"` (icon `MdEdit`, title "Sign"). Already signed → click → shows **Re-sign Blocked dialog** (§4.3a); field unchanged (icon `MdEditOff`, title "Signed"). Button disabled in view mode. |
 | Pay-in Slip No | `Input` | Free text; maps to `chequeNumber` |
 | Department | `Select` | Populated from `listDepartments()`, sorted by code |
 | Account Credited | `Select` | Filtered to accounts with code `"843"` only |
 | Drawer | `Input` + **LV=** quick-fill button | Quick-fill sets `payee = "LV="`; button hidden in view mode |
 | Policy Name / Cheque Details | `Input` | Maps to `notes` |
-| Policy Ref | `Input` | Free text |
+| Policy Ref | `Input` | Free text. Demo validation: value `"123"` on **Save** triggers **Policy Ref Error dialog** (§4.3b) and blocks save; OK clears the field. |
 | Cheque Amount | `Input type="number" step="0.01"` | Displayed in **red bold** (`#d72714`) |
 
 All fields are **read-only** in view mode (`ro = true`). Edit mode is entered via **[ Edit ]** button.
@@ -288,6 +288,61 @@ All fields are **read-only** in view mode (`ro = true`). Edit mode is entered vi
 | Save validation error | Destructive toast with message |
 
 ---
+
+### 4.3a ResignBlockedDialog (sub-dialog of ChequeLogModal)
+
+Triggered when the **Sign** button is clicked on a cheque that already has a `signedBy` value.
+
+```yaml
+width: 280px
+title_bar:
+  background: "#00263e"
+  label: "Information"
+  font: "Livvic 14px font-semibold text-white"
+body:
+  icon: "i"   // accent_blue (#006cf4), 22px
+  text: "You cannot re-sign a cheque!"
+  font: "Mulish 13px text-[#3d3d3d]"
+footer:
+  background: "#f5f7fa"
+  border: "border-t border-[#BBBBBB]"
+  layout: justify-center
+  buttons:
+    - label: "OK"
+      variant: primary
+      action: "close dialog; signedBy unchanged"
+behaviour:
+  - clicking outside is blocked (onInteractOutside preventDefault)
+  - Radix close button hidden
+```
+
+### 4.3b PolicyRefErrorDialog (sub-dialog of ChequeLogModal)
+
+Triggered when **Save** is clicked while `form.policyRef === "123"` (demo trigger for invalid reference).
+
+```yaml
+width: 320px
+title_bar:
+  background: "#00263e"
+  label: "Cheque Log"
+  font: "Livvic 14px font-semibold text-white"
+body:
+  text: "Policy Reference should either be blank or valid number."
+  font: "Mulish 13px text-[#3d3d3d]"
+  note: "no icon — body is plain text only"
+footer:
+  background: "#f5f7fa"
+  border: "border-t border-[#BBBBBB]"
+  layout: justify-center
+  buttons:
+    - label: "OK"
+      variant: primary
+      action: "close dialog AND clear policyRef field (set to empty string)"
+behaviour:
+  - clicking outside is blocked (onInteractOutside preventDefault)
+  - Radix close button hidden
+  - save is blocked until policyRef is changed or emptied
+```
 
 ### 4.3 ExitConfirmationDialog (sub-dialog of ChequeLogModal)
 

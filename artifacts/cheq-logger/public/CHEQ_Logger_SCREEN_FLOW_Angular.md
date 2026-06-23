@@ -132,7 +132,7 @@ Overlay modal, max-width 540 px, cannot be closed by clicking outside.
 |  Policy Ref       [ ___________________________________ ]              |
 |  Notes            [ ___________________________________ ]              |
 +------------------------------------------------------------------------+
-|  Signed By  [ ____________ ]           [ Sign / Unsign ]              |
+|  Signed By  [ ____________ ]           [ Sign ]                       |
 +------------------------------------------------------------------------+
 |  (browse mode)  [ Edit ]   [ Close ]                                   |
 |  (edit mode)    [ Save ]   [ Cancel ]   [ Close ]                      |
@@ -172,17 +172,68 @@ Cheques are sorted numerically ascending by logRef.
 | Amount | Numeric counter with ± spinner (£ GBP) |
 | Status | Outstanding / Cleared / Cancelled |
 | Cleared Date | Visible only when Status = Cleared |
-| Policy Ref | Free text (optional) |
+| Policy Ref | Free text (optional). Demo trigger: entering `123` and clicking **Save** shows the Policy Ref Error dialog (§3F) and blocks save. |
 | Notes | Free text (optional) |
-| Signed By | Free text; saved to `signedBy` on the record |
+| Signed By | Read-only display of the signer ID; set by the **Sign** button |
 
-### 3D. Sign / Unsign
+### 3D. Sign (one-way)
 
-- **Sign** — writes the current user ID into Signed By and saves immediately.
-- **Unsign** — clears Signed By and saves immediately.
-- Label toggles depending on whether `signedBy` is populated.
+Signing is **permanent** — once a cheque is signed it cannot be unsigned or re-signed.
 
-### 3E. Footer buttons
+| State | Button icon | Button title | Clicking |
+|-------|------------|--------------|---------|
+| Not signed | `MdEdit` | "Sign" | Sets `signedBy = "UAT3"`; field updates immediately |
+| Signed | `MdEditOff` | "Signed" | Shows **Re-sign Blocked dialog** (§3E); field unchanged |
+
+- The button is disabled (`opacity-40`) when the form is in read-only (view) mode.
+- `signedBy` is stored as `"UAT3"` (the demo user ID) and persisted on **Save**.
+
+### 3E. Re-sign Blocked dialog
+
+Shown when the Sign button is clicked on an already-signed cheque.
+
+```
++------------------------------------------+
+| Information                    [ × ]      |
++------------------------------------------+
+|  i   You cannot re-sign a cheque!        |
++------------------------------------------+
+|                   [ OK ]                 |
++------------------------------------------+
+```
+
+| Element | Detail |
+|---------|--------|
+| Title bar | Navy `#00263e`, label "Information" |
+| Icon | Blue `i` (`#006cf4`, 22px) |
+| Message | "You cannot re-sign a cheque!" (Mulish 13px) |
+| OK button | Primary; closes dialog; no change to the record |
+| Clicking outside | Blocked |
+
+### 3F. Policy Ref Error dialog
+
+Shown when **Save** is clicked while Policy Ref contains `123` (demo trigger for invalid reference).
+
+```
++------------------------------------------+
+| Cheque Log                     [ × ]      |
++------------------------------------------+
+|  Policy Reference should either be       |
+|  blank or valid number.                  |
++------------------------------------------+
+|                   [ OK ]                 |
++------------------------------------------+
+```
+
+| Element | Detail |
+|---------|--------|
+| Title bar | Navy `#00263e`, label "Cheque Log" |
+| Message | "Policy Reference should either be blank or valid number." (Mulish 13px) |
+| OK button | Primary; closes dialog **and clears the Policy Ref field** |
+| Clicking outside | Blocked |
+| Save | Blocked until Policy Ref is changed or emptied |
+
+### 3G. Footer buttons
 
 ```
 Browse mode:   [ Edit ]             [ Close ]
@@ -191,11 +242,11 @@ New mode:      [ Save ]  [ Cancel ] [ Close ]
 ```
 
 - **[ Edit ]** — enables Edit mode.
-- **[ Save ]** — persists changes; on New, auto-generates the next `logRef`.
+- **[ Save ]** — validates Policy Ref (§3F) first; persists changes; on New, auto-generates the next `logRef`.
 - **[ Cancel ]** — in New mode discards and returns to last saved cheque; in Edit mode restores original values.
-- **[ Close ]** / **[ × ]** / **Escape** — all trigger the Exit Confirmation dialog (§3F).
+- **[ Close ]** / **[ × ]** / **Escape** — all trigger the Exit Confirmation dialog (§3H).
 
-### 3F. Exit Confirmation Dialog
+### 3H. Exit Confirmation Dialog
 
 ```
 +------------------------------+
