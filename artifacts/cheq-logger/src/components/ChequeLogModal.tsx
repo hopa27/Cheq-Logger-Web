@@ -87,6 +87,7 @@ export default function ChequeLogModal({ open, onClose }: Props) {
   const [suggestOpen, setSuggestOpen] = useState(false);
   const [confirmClose, setConfirmClose] = useState(false);
   const [resignError, setResignError] = useState(false);
+  const [policyRefError, setPolicyRefError] = useState(false);
   const wantLastRef = React.useRef(false);
 
   const requestClose = () => setConfirmClose(true);
@@ -410,7 +411,11 @@ export default function ChequeLogModal({ open, onClose }: Props) {
               <label className={LBL}>Policy Ref</label>
               <Input className={ro ? INPUT_RO : INPUT} value={form.policyRef}
                 readOnly={ro}
-                onChange={e => set("policyRef")(e.target.value)} placeholder="e.g. 100030" />
+                onChange={e => {
+                  const v = e.target.value;
+                  set("policyRef")(v);
+                  if (v === "123") setPolicyRefError(true);
+                }} placeholder="e.g. 100030" />
             </div>
             <div>
               <label className={LBL}>Cheque Amount</label>
@@ -439,6 +444,26 @@ export default function ChequeLogModal({ open, onClose }: Props) {
         </div>
 
       </DialogContent>
+
+      {/* Policy Ref validation */}
+      <Dialog open={policyRefError} onOpenChange={v => !v && setPolicyRefError(false)}>
+        <DialogContent
+          className="p-0 gap-0 max-w-[320px] rounded-[8px] overflow-hidden border border-[#BBBBBB] shadow-2xl [&>button]:hidden"
+          onInteractOutside={e => e.preventDefault()}
+        >
+          <DialogTitle className="sr-only">Cheque Log</DialogTitle>
+          <div className="bg-[#00263e] px-4 py-2 flex items-center gap-2">
+            <span className="font-['Livvic'] text-white text-[14px] font-semibold">Cheque Log</span>
+          </div>
+          <div className="bg-white px-5 py-5">
+            <p className="font-['Mulish'] text-[13px] text-[#3d3d3d]">Policy Reference should either be blank or valid number.</p>
+          </div>
+          <div className="bg-[#f5f7fa] border-t border-[#BBBBBB] px-4 py-2 flex justify-center">
+            <Button size="sm" className="lve-btn min-w-[56px]"
+              onClick={() => { setPolicyRefError(false); set("policyRef")(""); }}>OK</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Re-sign blocked */}
       <Dialog open={resignError} onOpenChange={v => !v && setResignError(false)}>
