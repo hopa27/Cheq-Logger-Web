@@ -289,12 +289,16 @@ Policy No | Amount | Account Credited | Payin Slip No | Signed Posted
 |  |  ( ) Custom   — selected options applied.     ||
 |  +------------------------------------------------+|
 +---------------------------------------------------+
-|                        [ OK ]       [ Cancel ]    |
+| [ Options >>> ]          [ Cancel ]    [ OK ]     |
 +---------------------------------------------------+
 ```
 
-- **[ OK ]** — triggers download, closes both dialogs.
-- **[ Cancel ]** / **[ × ]** — returns to ExportDialog.
+| Button | Position | Action |
+|--------|----------|--------|
+| **[ Options >>> ]** | Footer left | Closes ExcelFormatDialog and returns to ExportDialog (same as Cancel) |
+| **[ Cancel ]** | Footer right | Closes ExcelFormatDialog and returns to ExportDialog |
+| **[ OK ]** | Footer right | Triggers download; closes ExcelFormatDialog and ExportDialog |
+| **[ × ]** | Title bar right | Closes ExcelFormatDialog and returns to ExportDialog |
 
 ---
 

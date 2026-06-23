@@ -472,18 +472,26 @@ body:
         description: "Data is exported according to selected options."
     radio_style: "accent-[#006cf4]"
 footer:
+  layout: "justify-between — Options >>> on the left; Cancel + OK on the right"
   background: "#f5f7fa"
   border: "border-t border-[#BBBBBB]"
   buttons:
+    - label: "Options >>>"
+      position: left
+      variant: secondary
+      action: "close ExcelFormatDialog, return to ExportDialog (same behaviour as Cancel)"
     - label: "Cancel"
+      position: right
       variant: secondary
       action: "close ExcelFormatDialog, return to ExportDialog"
     - label: "OK"
+      position: right
       variant: primary
       action: "close ExcelFormatDialog + ExportDialog; trigger Blob download"
 behaviour:
   - clicking outside is blocked
   - Radix close button hidden
+  - Options >>> mirrors the legacy Windows dialog button at the same position
 ```
 
 ---
