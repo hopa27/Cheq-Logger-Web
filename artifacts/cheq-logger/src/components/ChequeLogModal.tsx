@@ -412,11 +412,7 @@ export default function ChequeLogModal({ open, onClose }: Props) {
               <label className={LBL}>Policy Ref</label>
               <Input className={ro ? INPUT_RO : INPUT} value={form.policyRef}
                 readOnly={ro}
-                onChange={e => {
-                  const v = e.target.value;
-                  set("policyRef")(v);
-                  if (v === "123") setPolicyRefError(true);
-                }} placeholder="e.g. 100030" />
+                onChange={e => set("policyRef")(e.target.value)} placeholder="e.g. 100030" />
             </div>
             <div>
               <label className={LBL}>Cheque Amount</label>
