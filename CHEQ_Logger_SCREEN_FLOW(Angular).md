@@ -339,6 +339,32 @@ Policy No | Amount | Account Credited | Payin Slip No | Signed Posted
 
 Triggered by the `📅` icon in any date field (Menu dates, ChequeLogModal issue/cleared dates).
 
+### 5A. Typed input behaviour
+
+The text input accepts **digits only** — letters are silently blocked. Slashes are inserted automatically as the user types:
+
+```
+User types   →   Field shows
+1            →   1
+19           →   19
+196          →   19/6      (slash auto-inserted at position 3)
+1906         →   19/06
+19062        →   19/06/2   (slash auto-inserted at position 6)
+19062026     →   19/06/2026  (date committed to context)
+```
+
+Month clamping rules (enforced in real time):
+
+| Typed month digit | Rule | Example |
+|---|---|---|
+| First digit > 1 | Clamped to `1` | typing `3` → stored as `1` |
+| First digit = `1`, second digit > 2 | Clamped to `2` | `13` → `12` |
+| All other combinations | Accepted as-is | `09`, `12` |
+
+The date is committed to the context only when all 8 digits form a valid calendar date. Clearing the field fires `onChange("")`.
+
+### 5B. Calendar popover
+
 ```
 Days view                        Months view                   Years view
 +----------------------+         +----------------------+       +----------------------+

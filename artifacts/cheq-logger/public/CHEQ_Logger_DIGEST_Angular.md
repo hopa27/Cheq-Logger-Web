@@ -183,8 +183,17 @@ inputs:
   - disabled:       boolean   // propagated from parent read-only state
   - inputClassName: string    // tailwind override for the trigger input
 trigger:
-  - text input showing formatted date (dd/mm/yyyy)
-  - calendar icon button on the right
+  text_input:
+    placeholder: "DD/MM/YYYY"
+    default: ""   # empty until user selects or types a date
+    accepts: digits only — letters are silently blocked
+    auto_format: slashes inserted automatically (no need to type them)
+    clamping:
+      month_digit_1: max 1  (e.g. typing '3' → stored as '1')
+      month_digit_2: max 2 when digit_1 is '1'  (e.g. '13' → '12')
+    commit: onChange fires only when all 8 digits form a valid calendar date
+    clear: onChange("") fires when field is emptied
+  calendar_icon: right-aligned button; opens calendar popover
 popover:
   width: 280px
   calendar_view: Days (Mon–Sun grid)
