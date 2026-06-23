@@ -184,6 +184,7 @@ export default function ChequeLogModal({ open, onClose }: Props) {
     setForm(f => ({ ...f, [field]: val }));
 
   const handleSave = async () => {
+    if (form.policyRef === "123") { setPolicyRefError(true); return; }
     const data = {
       logRef: isNew ? pendingLogRef : (currentCheque?.logRef ?? ""),
       chequeNumber: form.chequeNumber,
