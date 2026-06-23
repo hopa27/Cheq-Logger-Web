@@ -86,9 +86,12 @@ function ExcelFormatDialog({
         </div>
 
         {/* LV footer */}
-        <div className="bg-[#f5f7fa] border-t border-[#BBBBBB] px-5 py-3 flex justify-end gap-2">
-          <Button variant="secondary" size="sm" onClick={onCancel}>Cancel</Button>
-          <Button size="sm" onClick={() => onOk(style)}>OK</Button>
+        <div className="bg-[#f5f7fa] border-t border-[#BBBBBB] px-5 py-3 flex items-center justify-between gap-2">
+          <Button variant="secondary" size="sm" onClick={onCancel}>Options &gt;&gt;&gt;</Button>
+          <div className="flex gap-2">
+            <Button variant="secondary" size="sm" onClick={onCancel}>Cancel</Button>
+            <Button size="sm" onClick={() => onOk(style)}>OK</Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
