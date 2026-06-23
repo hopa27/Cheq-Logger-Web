@@ -643,11 +643,11 @@ export default function AccountsReportModal({ open, onClose }: Props) {
             >
               {currentPage === 1 && (
                 <div style={{ width: A4_W, height: A4_H, background: "white", boxShadow: "0 2px 8px rgba(0,0,0,0.35)", padding: "40px 48px", overflow: "hidden", boxSizing: "border-box" }}>
-                  <h2 style={{ textAlign: "center", fontFamily: "Mulish, Arial, sans-serif", fontWeight: 700, fontSize: 13, marginBottom: 6, textTransform: "uppercase", letterSpacing: 1, color: "#3d3d3d" }}>
-                    Accounts Report
+                  <h2 style={{ textAlign: "center", fontFamily: "Mulish, Arial, sans-serif", fontWeight: 700, fontSize: 13, marginBottom: 6, textTransform: "uppercase", letterSpacing: 1, color: "#3d3d3d", textDecoration: "underline" }}>
+                    Cheques for Account No: 843 Between
                   </h2>
                   <div style={{ textAlign: "center", fontFamily: "Mulish, Arial, sans-serif", fontSize: 11, color: "#3d3d3d", marginBottom: 18 }}>
-                    {fmtRangeLabel(startDate)}&nbsp;&nbsp;to&nbsp;&nbsp;{fmtRangeLabel(endDate)}
+                    {fmtRangeLabel(startDate)}&nbsp;&nbsp;&nbsp;&nbsp;to&nbsp;&nbsp;&nbsp;&nbsp;{fmtRangeLabel(endDate)}
                   </div>
                   <div className="font-['Mulish'] font-bold text-[9.5px] text-[#3d3d3d] pb-1">
                     1. Account No. 843
