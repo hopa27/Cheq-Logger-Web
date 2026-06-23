@@ -53,7 +53,19 @@ export function DatePicker({
     const raw = e.target.value;
 
     // Strip everything that is not a digit; cap at 8 digits (ddmmyyyy)
-    const digits = raw.replace(/\D/g, "").slice(0, 8);
+    let digits = raw.replace(/\D/g, "").slice(0, 8);
+
+    // Clamp month: digit[2] (first month digit) must be 0 or 1
+    if (digits.length >= 3) {
+      const m0 = parseInt(digits[2], 10);
+      if (m0 > 1) digits = digits.slice(0, 2) + "1" + digits.slice(3);
+    }
+    // digit[3] (second month digit): if first is '1', second can be at most '2'
+    if (digits.length >= 4) {
+      if (digits[2] === "1" && parseInt(digits[3], 10) > 2) {
+        digits = digits.slice(0, 3) + "2" + digits.slice(4);
+      }
+    }
 
     // Auto-insert slashes to build DD/MM/YYYY
     let formatted: string;
