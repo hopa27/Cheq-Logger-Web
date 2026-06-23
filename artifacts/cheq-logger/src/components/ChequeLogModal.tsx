@@ -86,6 +86,7 @@ export default function ChequeLogModal({ open, onClose }: Props) {
   const [pendingLogRef, setPendingLogRef] = useState("");
   const [suggestOpen, setSuggestOpen] = useState(false);
   const [confirmClose, setConfirmClose] = useState(false);
+  const [resignError, setResignError] = useState(false);
   const wantLastRef = React.useRef(false);
 
   const requestClose = () => setConfirmClose(true);
@@ -330,8 +331,11 @@ export default function ChequeLogModal({ open, onClose }: Props) {
                 />
                 <button
                   type="button"
-                  onClick={() => setSignedBy(signedBy ? "" : "UAT3")}
-                  title={signedBy ? "Unsign" : "Sign"}
+                  onClick={() => {
+                    if (signedBy) { setResignError(true); return; }
+                    setSignedBy("UAT3");
+                  }}
+                  title={signedBy ? "Signed" : "Sign"}
                   disabled={ro}
                   className="lve-btn lve-btn-secondary shrink-0 !h-[44px] !w-[44px] !rounded-[6px] !p-0 flex items-center justify-center disabled:opacity-40 disabled:cursor-default"
                 >
@@ -435,6 +439,27 @@ export default function ChequeLogModal({ open, onClose }: Props) {
         </div>
 
       </DialogContent>
+
+      {/* Re-sign blocked */}
+      <Dialog open={resignError} onOpenChange={v => !v && setResignError(false)}>
+        <DialogContent
+          className="p-0 gap-0 max-w-[280px] rounded-[8px] overflow-hidden border border-[#BBBBBB] shadow-2xl [&>button]:hidden"
+          onInteractOutside={e => e.preventDefault()}
+        >
+          <DialogTitle className="sr-only">Information</DialogTitle>
+          <div className="bg-[#00263e] px-4 py-2 flex items-center gap-2">
+            <span className="font-['Livvic'] text-white text-[14px] font-semibold">Information</span>
+          </div>
+          <div className="bg-white px-5 py-5 flex items-start gap-3">
+            <span className="text-[#006cf4] text-[22px] leading-none select-none">i</span>
+            <p className="font-['Mulish'] text-[13px] text-[#3d3d3d] pt-[2px]">You cannot re-sign a cheque!</p>
+          </div>
+          <div className="bg-[#f5f7fa] border-t border-[#BBBBBB] px-4 py-2 flex justify-center">
+            <Button size="sm" className="lve-btn min-w-[56px]"
+              onClick={() => setResignError(false)}>OK</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Exit confirmation */}
       <Dialog open={confirmClose} onOpenChange={v => !v && setConfirmClose(false)}>
