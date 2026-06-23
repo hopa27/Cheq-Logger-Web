@@ -51,9 +51,28 @@ export function DatePicker({
 
   const handleTyping = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value;
-    setTypedValue(raw);
-    const parsed = parse(raw, "dd/MM/yyyy", new Date());
-    if (isValid(parsed) && raw.length === 10 && onChange) {
+
+    // Strip everything that is not a digit; cap at 8 digits (ddmmyyyy)
+    const digits = raw.replace(/\D/g, "").slice(0, 8);
+
+    // Auto-insert slashes to build DD/MM/YYYY
+    let formatted: string;
+    if (digits.length <= 2) {
+      formatted = digits;
+    } else if (digits.length <= 4) {
+      formatted = `${digits.slice(0, 2)}/${digits.slice(2)}`;
+    } else {
+      formatted = `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
+    }
+
+    setTypedValue(formatted);
+
+    // Clear the external value when field is emptied
+    if (!formatted && onChange) { onChange(""); return; }
+
+    // Fire onChange only when a fully valid date has been entered
+    const parsed = parse(formatted, "dd/MM/yyyy", new Date());
+    if (isValid(parsed) && formatted.length === 10 && onChange) {
       onChange(format(parsed, "yyyy-MM-dd"));
     }
   };
