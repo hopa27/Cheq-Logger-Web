@@ -282,6 +282,7 @@ interface Props {
 }
 
 function fmtRangeLabel(d: string) {
+  if (!d) return "";
   return format(new Date(d), "dd MMMM yyyy");
 }
 

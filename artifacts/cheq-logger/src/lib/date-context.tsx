@@ -10,8 +10,8 @@ interface DateRangeContextType {
 const DateRangeContext = createContext<DateRangeContextType | undefined>(undefined);
 
 export function DateRangeProvider({ children }: { children: ReactNode }) {
-  const [startDate, setStartDate] = useState("2025-12-03");
-  const [endDate, setEndDate] = useState("2026-06-12");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   return (
     <DateRangeContext.Provider value={{ startDate, endDate, setStartDate, setEndDate }}>
